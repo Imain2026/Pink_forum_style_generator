@@ -1253,6 +1253,8 @@
 
             let currentThemeId = '';
             let currentHue = 340;
+            let pendingThemeId = '';
+            let pendingHue = 340;
 
             function hslToHex(h, s, l) {
                 s /= 100; l /= 100;
@@ -1675,8 +1677,8 @@
                 const slider = document.getElementById('hueSlider');
                 const valSpan = document.getElementById('hueValue');
                 if (slider && valSpan) {
-                    slider.value = currentHue >= 0 ? currentHue : 340;
-                    valSpan.textContent = (currentHue >= 0 ? currentHue : 340) + '°';
+                    slider.value = pendingHue >= 0 ? pendingHue : 340;
+                    valSpan.textContent = (pendingHue >= 0 ? pendingHue : 340) + '°';
                 }
             }
 
@@ -2096,13 +2098,16 @@
                 CONFIG.boardName=document.getElementById('cfgBoardName').value.trim()||CONFIG.boardName;
                 CONFIG.boardId=document.getElementById('cfgBoardId').value.trim()||CONFIG.boardId;
                 CONFIG.threadTitle=document.getElementById('cfgThreadTitle').value.trim()||CONFIG.threadTitle;
-                saveToStorage(); renderAll(); closeModal('modalConfigOverlay');
+                setTheme(pendingThemeId, pendingHue);
+                saveToStorage(); closeModal('modalConfigOverlay');
                 showToast('配置已保存','success');
             });
             function populateConfigModal() {
                 document.getElementById('cfgBoardName').value=CONFIG.boardName;
                 document.getElementById('cfgBoardId').value=CONFIG.boardId;
                 document.getElementById('cfgThreadTitle').value=CONFIG.threadTitle;
+                pendingThemeId = currentThemeId;
+                pendingHue = currentHue;
                 renderPresetGrid();
                 updateHueSlider();
             }
@@ -2130,7 +2135,7 @@
                     swatchBg = hslToHex(hue, 55, 88);
                     swatchInner = hslToHex(hue, 58, 43);
                 }
-                const activeClass = p.id === currentThemeId ? ' active' : '';
+                const activeClass = p.id === pendingThemeId ? ' active' : '';
                 return '<div class="preset-tile' + activeClass + '" data-theme-id="' + p.id + '" data-theme-hue="' + p.hue + '">' +
                     '<div class="preset-swatch" style="background:' + swatchBg + ';border-bottom:3px solid ' + swatchInner + '"></div>' +
                     '<span class="preset-name">' + p.name + '</span></div>';
@@ -2143,22 +2148,25 @@
                 if (gridNight) gridNight.innerHTML = THEME_PRESETS_NIGHT.map(buildPresetTile).join('');
             }
 
-            // 预设点击
+            // 预设点击（仅更新选中态，不立即应用）
             document.addEventListener('click', function(e) {
                 const tile = e.target.closest('.preset-tile');
                 if (!tile) return;
-                const themeId = tile.dataset.themeId;
-                const hue = parseInt(tile.dataset.themeHue) || 0;
-                setTheme(themeId, hue);
+                pendingThemeId = tile.dataset.themeId;
+                pendingHue = parseInt(tile.dataset.themeHue) || 0;
+                renderPresetGrid();
+                updateHueSlider();
             });
 
-            // 色相滑块
+            // 色相滑块（仅更新预览，不立即应用）
             const hueSliderEl = document.getElementById('hueSlider');
             if (hueSliderEl) {
                 hueSliderEl.addEventListener('input', function() {
                     const hue = parseInt(this.value);
                     document.getElementById('hueValue').textContent = hue + '°';
-                    setTheme('custom', hue);
+                    pendingThemeId = 'custom';
+                    pendingHue = hue;
+                    renderPresetGrid();
                 });
             }
 
