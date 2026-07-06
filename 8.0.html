@@ -32,7 +32,6 @@
             --modal-bg: #fff;
             --input-border: #dcc;
             --input-focus: #c2798f;
-            --color-swatch-size: 50px;
         }
 
         * {
@@ -441,6 +440,11 @@
             padding: 20px 22px;
             position: relative;
         }
+        #modalChars {
+            overflow-y: visible;
+            display: flex;
+            flex-direction: column;
+        }
         .modal h3 {
             font-size: 17px;
             color: #8b4a5e;
@@ -499,6 +503,46 @@
             resize: vertical;
             line-height: 1.5;
         }
+        .form-row {
+            display: flex;
+            gap: 12px;
+        }
+        .form-half {
+            flex: 1;
+        }
+
+        /* 楼层省略占位 */
+        .floor-gap {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 20px;
+            color: #bbb;
+            font-size: 13px;
+            user-select: none;
+            border-bottom: 1px solid var(--post-separator);
+        }
+        .floor-gap::before,
+        .floor-gap::after {
+            content: '';
+            flex: 1;
+            height: 0;
+            border-top: 1px dashed #e0d0d6;
+        }
+        .floor-gap-text {
+            white-space: nowrap;
+            color: #c0a0ae;
+            font-style: italic;
+        }
+        .floor-gap-more {
+            white-space: nowrap;
+            color: #d4b0be;
+            font-size: 12px;
+            cursor: default;
+            text-decoration: underline;
+            text-decoration-style: dotted;
+            text-underline-offset: 3px;
+        }
         .hint {
             font-size: 11px;
             color: #aaa;
@@ -537,6 +581,22 @@
         .btn-secondary:hover {
             background: #f5f5f5;
         }
+        .btn-hidden-post {
+            float: right;
+            font-size: 11px;
+            padding: 2px 10px;
+            border-radius: 10px;
+            border: 1px solid #d99;
+            background: #fff;
+            color: #c55;
+            cursor: pointer;
+            font-weight: 400;
+            line-height: 1.4;
+        }
+        .btn-hidden-post:hover {
+            background: #fef5f5;
+            border-color: #c55;
+        }
         .btn-danger {
             background: #d47777;
             color: #fff;
@@ -546,6 +606,23 @@
             background: #c25555;
         }
 
+        /* 角色管理列表项 */
+        .char-list-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-bottom: 1px solid #f5f5f5;
+            flex-wrap: wrap;
+        }
+        /* 角色管理操作按钮网格 */
+        .char-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 6px;
+            flex-shrink: 0;
+            margin-left: auto;
+        }
         /* 角色管理胶囊按钮 */
         .char-btn {
             font-size: 11px;
@@ -610,6 +687,26 @@
             background: #fdf0f4;
         }
 
+        .ref-clear-btn {
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 14px;
+            color: #999;
+            z-index: 6;
+            line-height: 1;
+            user-select: none;
+        }
+        .ref-clear-btn:hover { color: #555; }
+
+        .search-select-option mark {
+            background: #ffe0e8;
+            color: #c24949;
+            font-weight: 600;
+        }
+
         .alias-confirm-btn {
             padding: 8px 14px;
             border-radius: 8px;
@@ -632,48 +729,15 @@
             background: #d98da6;
         }
 
-        .color-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px 20px;
-            margin-top: 8px;
+        /* 角色列表固定高度内部滚动 */
+        #charListContainer {
+            max-height: 55vh;
+            overflow-y: auto;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            padding: 0 8px;
         }
-        .color-item {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 6px;
-            text-align: center;
-        }
-        .color-item label {
-            font-size: 13px;
-            color: #555;
-            font-weight: 500;
-            margin-bottom: 0;
-        }
-        .color-swatch {
-            width: var(--color-swatch-size);
-            height: var(--color-swatch-size);
-            border-radius: 10px;
-            border: 2px solid #ddd;
-            cursor: pointer;
-            transition: border-color 0.2s;
-            position: relative;
-            flex-shrink: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .color-swatch:hover {
-            border-color: #aaa;
-        }
-        .color-swatch-input {
-            position: absolute;
-            opacity: 0;
-            width: 100%;
-            height: 100%;
-            cursor: pointer;
-        }
+
 
         .checkbox-group {
             display: flex;
@@ -765,9 +829,6 @@
                 font-size: 12px;
                 padding: 8px 4px;
             }
-            .color-grid {
-                gap: 12px;
-            }
         }
     </style>
 </head>
@@ -814,20 +875,17 @@
     <!-- 角色管理 -->
     <div class="modal-overlay" id="modalCharsOverlay">
         <div class="modal" id="modalChars">
-            <span class="modal-close" data-close="modalCharsOverlay">✕</span>
             <h3>👤 角色库管理</h3>
             <div id="charListContainer"></div>
-            <div class="form-group" style="margin-top:14px;">
+            <div class="form-group" style="margin-top:10px;">
                 <input type="text" id="charSearch" placeholder="搜索角色（昵称或ID）">
             </div>
-            <div style="border-top:1px solid #eee; margin-top:14px; padding-top:14px;">
-                <h4 style="font-size:14px; color:#8b4a5e; margin-bottom:10px;">添加新角色（均可留空）</h4>
-                <div class="form-group"><label>昵称（默认“==”）</label><input type="text" id="newCharName" placeholder="留空默认“==”"></div>
-                <div class="form-group"><label>ID（随机生成）</label><input type="text" id="newCharId" placeholder="留空自动生成8位hex"></div>
-                <div class="form-actions"><button class="btn-primary" id="btnAddChar">添加角色</button></div>
-            </div>
-            <div class="form-actions" style="margin-top:10px;">
-                <button class="btn-secondary" data-close="modalCharsOverlay">关闭</button>
+            <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
+                <div class="form-row">
+                    <div class="form-group form-half"><label>昵称 <span class="hint">新角色</span></label><input type="text" id="newCharName" placeholder='留空默认"=="'></div>
+                    <div class="form-group form-half"><label>ID</label><input type="text" id="newCharId" placeholder="自动生成"></div>
+                </div>
+                <div class="form-actions" style="margin-top:12px;"><button class="btn-primary" id="btnAddChar">添加角色</button><button class="btn-secondary" data-close="modalCharsOverlay">关闭</button></div>
             </div>
         </div>
     </div>
@@ -835,26 +893,13 @@
     <!-- 配置编辑 -->
     <div class="modal-overlay" id="modalConfigOverlay">
         <div class="modal" id="modalConfig">
-            <span class="modal-close" data-close="modalConfigOverlay">✕</span>
             <h3>⚙ 编辑板块配置</h3>
             <div class="form-group"><label>板块名称</label><input type="text" id="cfgBoardName"></div>
             <div class="form-group"><label>板块ID</label><input type="text" id="cfgBoardId"></div>
             <div class="form-group"><label>帖子标题</label><input type="text" id="cfgThreadTitle"></div>
-            <div style="border-top:1px solid #eee; margin:16px 0; padding-top:14px;">
-                <h4 style="font-size:14px; color:#8b4a5e; margin-bottom:12px; text-align:center;">🎨 自定义颜色</h4>
-                <div class="color-grid">
-                    <div class="color-item"><label>页面背景</label><div class="color-swatch"><input type="color" id="cfgPageBg" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>帖子背景</label><div class="color-swatch"><input type="color" id="cfgPrimaryBg" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>头部背景</label><div class="color-swatch"><input type="color" id="cfgHeaderBg" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>引用块背景</label><div class="color-swatch"><input type="color" id="cfgQuoteBg" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>用户名颜色</label><div class="color-swatch"><input type="color" id="cfgUsernameColor" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>高亮文字</label><div class="color-swatch"><input type="color" id="cfgHighlightColor" class="color-swatch-input"></div></div>
-                    <div class="color-item"><label>默认头像背景</label><div class="color-swatch"><input type="color" id="cfgAvatarBg" class="color-swatch-input"></div></div>
-                </div>
-            </div>
             <div class="form-actions" style="gap: 12px; justify-content: space-between;">
-                <button class="btn-secondary" data-close="modalConfigOverlay" style="flex:1; max-width:48%;">取消</button>
                 <button class="btn-primary" id="btnSaveConfig" style="flex:1; max-width:48%;">保存配置</button>
+                <button class="btn-secondary" data-close="modalConfigOverlay" style="flex:1; max-width:48%;">关闭</button>
             </div>
         </div>
     </div>
@@ -862,7 +907,6 @@
     <!-- 楼层编辑 (已重构：统一角色选择/新建) -->
     <div class="modal-overlay" id="modalPostOverlay">
         <div class="modal" id="modalPost">
-            <span class="modal-close" data-close="modalPostOverlay">✕</span>
             <h3 id="modalPostTitle">编辑楼层</h3>
             <input type="hidden" id="postEditIndex" value="-1">
 
@@ -874,13 +918,19 @@
                         <input type="text" class="search-select-input" id="charSearchInput" placeholder="搜索昵称或ID，输入新昵称可创建" autocomplete="off">
                         <div class="search-select-list" id="charSearchList"></div>
                     </div>
-                    <button class="alias-confirm-btn disabled" id="btnCharConfirm" disabled>确认角色</button>
+                    <button class="alias-confirm-btn disabled" id="btnCharConfirm" disabled>确认</button>
                 </div>
+            </div>
+
+            <!-- 指定/随机ID -->
+            <div class="form-group" id="groupCustomId">
+                <label>指定 / 随机ID</label>
+                <input type="text" id="postCustomId" placeholder="留空自动生成8位hex">
             </div>
 
             <!-- 别名区，始终显示 -->
             <div class="form-group" id="groupAliasSelect">
-                <label>选择 / 新建昵称（别名）</label>
+                <label>选择/新建别名</label>
                 <div style="display:flex; gap:6px;">
                     <div class="search-select-wrap" style="flex:1;">
                         <input type="text" class="search-select-input" id="aliasSearchInput" placeholder="输入别名，新别名需确认" autocomplete="off">
@@ -890,31 +940,36 @@
                 </div>
             </div>
 
-            <!-- 指定/随机ID，仅新建角色时显示 -->
-            <div class="form-group" id="groupCustomId">
-                <label>指定 / 随机ID（留空随机生成8位hex）</label>
-                <input type="text" id="postCustomId" placeholder="留空自动生成8位hex">
-            </div>
-
             <div class="form-group"><label>引用楼层</label>
-                <div class="search-select-wrap"><input type="text" class="search-select-input" id="refSearchInput" placeholder="搜索楼层号或内容..." autocomplete="off"><div class="search-select-list" id="refList"></div></div>
-                <div style="font-size:12px;color:#888;margin-top:4px;" id="refSelectedDisplay">未选择引用</div>
+                <div class="search-select-wrap" style="position:relative;">
+                    <input type="text" class="search-select-input" id="refSearchInput" placeholder="搜索楼层号或内容" autocomplete="off" style="padding-right:28px;">
+                    <span class="ref-clear-btn" id="refClearBtn" style="display:none;">✕</span>
+                    <div class="search-select-list" id="refList"></div>
+                </div>
                 <input type="hidden" id="postQuoteRef" value="-1">
             </div>
-            <div class="form-group"><label>发布时间</label><input type="text" id="postTime" placeholder="2026-07-05 09:12:08"></div>
-            <div class="form-group"><label>内容 <span class="hint">回车自动换行，支持HTML标签</span></label><textarea id="postContent" placeholder="输入帖子内容..."></textarea></div>
-            <div class="form-actions"><button class="btn-primary" id="btnSavePost">保存</button><button class="btn-secondary" data-close="modalPostOverlay">取消</button></div>
+            <div class="form-row">
+                <div class="form-group form-half">
+                    <label>楼层号 <span class="hint" id="floorNoHint">可跳过</span></label>
+                    <input type="number" id="postFloorNo" min="0" placeholder="自动">
+                </div>
+                <div class="form-group form-half">
+                    <label>发布时间</label>
+                    <input type="text" id="postTime" placeholder="2026-07-05 09:12:08">
+                </div>
+            </div>
+            <div class="form-group"><label>内容 <span class="hint">回车自动换行，支持HTML标签</span><button class="btn-hidden-post" id="btnHiddenPost">此楼层不可见</button></label><textarea id="postContent" placeholder="输入帖子内容..."></textarea></div>
+            <div class="form-actions"><button class="btn-primary" id="btnSavePost">保存</button><button class="btn-secondary" data-close="modalPostOverlay">关闭</button></div>
         </div>
     </div>
 
     <!-- 导入导出 -->
     <div class="modal-overlay" id="modalImportExportOverlay">
         <div class="modal" id="modalImportExport">
-            <span class="modal-close" data-close="modalImportExportOverlay">✕</span>
             <h3>📤 导入 / 导出</h3>
-            <div style="margin-bottom:20px;"><h4 style="font-size:15px;color:#8b4a5e;margin-bottom:10px;">⬇️ 导出</h4><div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="exportConfig" checked> 配置</label><label class="checkbox-item"><input type="checkbox" id="exportData" checked> 数据（帖子+角色）</label></div><div style="display:flex;justify-content:flex-end;"><button class="btn-primary" id="btnExportFile">📥 导出选中内容</button></div></div>
-            <div style="border-top:1px solid #eee;padding-top:20px;"><h4 style="font-size:15px;color:#8b4a5e;margin-bottom:10px;">⬆️ 导入</h4><div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="importConfig" checked> 配置</label><label class="checkbox-item"><input type="checkbox" id="importData" checked> 数据（帖子+角色）</label></div><div class="file-upload-area" id="fileUploadArea"><span id="fileUploadLabel">点击选择 JSON 文件或拖拽到此处</span><input type="file" id="importFileInput" accept=".json"></div><div style="display:flex;justify-content:flex-end;"><button class="btn-primary" id="btnImportFile">📤 导入文件</button></div></div>
-            <div class="form-actions" style="margin-top:16px;"><button class="btn-secondary" data-close="modalImportExportOverlay">关闭</button></div>
+            <div style="margin-bottom:20px;"><h4 style="font-size:15px;color:#8b4a5e;margin-bottom:10px;">⬇️ 导出</h4><div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="exportConfig" checked> 配置</label><label class="checkbox-item"><input type="checkbox" id="exportData" checked> 数据（帖子+角色）</label></div><div class="form-actions" style="justify-content:flex-start;"><button class="btn-primary" id="btnExportFile">📤 导出JSON</button></div></div>
+            <div style="border-top:1px solid #eee;padding-top:20px;"><h4 style="font-size:15px;color:#8b4a5e;margin-bottom:10px;">⬆️ 导入</h4><div class="file-upload-area" id="fileUploadArea"><span id="fileUploadLabel">点击选择 JSON 文件或拖拽到此处</span><input type="file" id="importFileInput" accept=".json"></div><div class="form-actions" style="justify-content:flex-start;"><button class="btn-primary" id="btnImportFile">📥 导入JSON</button></div></div>
+            <div class="form-actions"><button class="btn-secondary" data-close="modalImportExportOverlay">关闭</button></div>
         </div>
     </div>
 
@@ -930,7 +985,7 @@
             </div>
             <div style="text-align:center; margin-top:10px;">
               <label style="font-size:12px;color:#666;">缩放</label>
-              <input type="range" id="cropZoom" min="0.5" max="2.5" step="0.1" value="1" style="width:200px;vertical-align:middle;margin-left:8px;">
+              <input type="range" id="cropZoom" min="0.1" max="8" step="0.1" value="1" style="width:200px;vertical-align:middle;margin-left:8px;">
             </div>
             <div class="form-group">
                 <label>上传本地图片</label>
@@ -939,7 +994,6 @@
             <div class="form-actions" style="justify-content:space-between;">
                 <button class="btn-danger" id="btnDeleteAvatar">删除头像</button>
                 <button class="btn-primary" id="btnSaveAvatar">保存头像</button>
-                <button class="btn-secondary" data-close="modalAvatarOverlay">取消</button>
             </div>
         </div>
     </div>
@@ -949,21 +1003,17 @@
             const DEFAULT_CONFIG = {
                 boardName: '示例板块', boardId: 'ID:9970811',
                 threadTitle: '【示例】There is a example.',
-                pageBg: '#f5f5f5', primaryBg: '#ffffff',
-                headerBg: '#fedbef', quoteBg: '#fcf3f6',
-                usernameColor: '#c24949', highlightColor: '#c24949',
-                avatarBg: '#fededf',
             };
             const DEFAULT_CHARACTERS = [
-                { id: '7410ea09', name: '==', aliases: ['=='], avatar: '' },
-                { id: 'lb0608178', name: 'Ku', aliases: ['Ku'], avatar: '' },
-                { id: '8521fb10', name: 'Sa', aliases: ['Sa'], avatar: '' },
+                { id: '7410ea09', name: '==', aliases: ['=='], avatar: '', favorite: false },
+                { id: 'lb0608178', name: 'Ku', aliases: ['Ku'], avatar: '', favorite: false },
+                { id: '8521fb10', name: 'Sa', aliases: ['Sa'], avatar: '', favorite: false },
             ];
             const DEFAULT_POSTS = [
-                { userId: '7410ea09', username: '==', time: '2026-07-05 09:12:08', content: 'rbt，<span class="highlight">"主楼示例"</span>' },
-                { userId: '7410ea09', username: '==', time: '2026-07-05 09:14:35', content: 'LZ的回复示例', quote: { refNo: 0, refContent: 'rbt，<span class="highlight">"主楼示例"</span>' } },
-                { userId: 'lb0608178', username: 'Ku', time: '2026-07-05 09:28:41', content: 'A角色的跟帖示例' },
-                { userId: '8521fb10', username: 'Sa', time: '2026-07-05 09:33:17', content: 'B角色的跟贴回复示例', quote: { refNo: 2, refContent: 'A角色的跟帖示例' } }
+                { no:0, userId: '7410ea09', username: '==', time: '2026-07-05 09:12:08', content: 'rbt，<span class="highlight">"主楼示例"</span>' },
+                { no:1, userId: '7410ea09', username: '==', time: '2026-07-05 09:14:35', content: 'LZ的回复示例', quote: { refNo: 0, refContent: 'rbt，<span class="highlight">"主楼示例"</span>' } },
+                { no:2, userId: 'lb0608178', username: 'Ku', time: '2026-07-05 09:28:41', content: 'A角色的跟帖示例' },
+                { no:3, userId: '8521fb10', username: 'Sa', time: '2026-07-05 09:33:17', content: 'B角色的跟贴回复示例', quote: { refNo: 2, refContent: 'A角色的跟帖示例' } }
             ];
 
             const POSTS_PER_PAGE = 20;
@@ -985,34 +1035,77 @@
             function truncateText(t,l=80) { const p=stripHtml(t); return p.length>l?p.slice(0,l)+'...':p; }
             function nowTimeStr() { const d=new Date(); const pad=n=>String(n).padStart(2,'0'); return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`; }
             function findCharById(id) { return CHARACTERS.find(c=>c.id===id); }
+            function findPostByNo(floorNo) { return POSTS.find(p=>p.no===floorNo); }
+            function findPostIndexByNo(floorNo) { return POSTS.findIndex(p=>p.no===floorNo); }
+            function getNextFloorNo() { if(POSTS.length===0)return 0; return Math.max(...POSTS.map(p=>p.no||0))+1; }
+            function getSearchSnippet(content, query, maxLen) {
+                maxLen = maxLen || 22;
+                var div = document.createElement('div');
+                div.innerHTML = content;
+                var text = div.textContent || '';
+                var compactAll = text.replace(/\s+/g, ' ');
+                if (!compactAll.trim()) return '';
+
+                if (!query) {
+                    var s = compactAll.trim();
+                    return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
+                }
+
+                var ql = query.toLowerCase();
+                var lines = text.split('\n');
+                var foundLine = '', foundPos = -1;
+
+                for (var i = 0; i < lines.length; i++) {
+                    var li = lines[i].trim();
+                    if (!li) continue;
+                    var pos = li.toLowerCase().indexOf(ql);
+                    if (pos !== -1) { foundLine = li; foundPos = pos; break; }
+                }
+
+                if (foundPos === -1) {
+                    var idx = compactAll.toLowerCase().indexOf(ql);
+                    if (idx === -1) {
+                        var ss = compactAll.trim();
+                        return ss.length > maxLen ? ss.slice(0, maxLen) + '…' : ss;
+                    }
+                    foundLine = compactAll;
+                    foundPos = idx;
+                }
+
+                var half = Math.floor((maxLen - query.length) / 2);
+                var start = Math.max(0, foundPos - half);
+                var end = Math.min(foundLine.length, start + maxLen);
+                if (end - start < maxLen) start = Math.max(0, end - maxLen);
+                var snippet = foundLine.slice(start, end).trim();
+                if (start > 0) snippet = '…' + snippet;
+                if (end < foundLine.length) snippet = snippet + '…';
+                return snippet;
+            }
 
             let toastTimer;
             function showToast(msg,type='') { clearTimeout(toastTimer); $toast.textContent=msg; $toast.className='toast '+type+' show'; toastTimer=setTimeout(()=>$toast.classList.remove('show'),2000); }
 
             function saveToStorage() { try{localStorage.setItem(STORAGE_KEY,JSON.stringify({config:CONFIG,characters:CHARACTERS,posts:POSTS}));}catch(e){} }
             function loadFromStorage() { try{const r=localStorage.getItem(STORAGE_KEY); if(r){const d=JSON.parse(r); if(d.config)CONFIG=d.config; if(d.characters)CHARACTERS=d.characters; if(d.posts)POSTS=d.posts; return true;}}catch(e){} return false; }
-            function resetToDefault() { CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); applyConfigColors(); saveToStorage(); renderAll(); showToast('已重置','warning'); }
-
-            function applyConfigColors() {
-                const r=document.documentElement;
-                r.style.setProperty('--page-bg', CONFIG.pageBg||'#f5f5f5');
-                r.style.setProperty('--primary-bg', CONFIG.primaryBg||'#ffffff');
-                r.style.setProperty('--header-bg', CONFIG.headerBg||'#fedbef');
-                r.style.setProperty('--quote-bg', CONFIG.quoteBg||'#fcf3f6');
-                r.style.setProperty('--username-color', CONFIG.usernameColor||'#c24949');
-                r.style.setProperty('--highlight-color', CONFIG.highlightColor||'#c24949');
-                r.style.setProperty('--avatar-bg', CONFIG.avatarBg|| '#fededf');
-            }
-            function updateColorSwatches() {
-                document.querySelectorAll('.color-swatch').forEach(sw=>{
-                    const inp=sw.querySelector('.color-swatch-input');
-                    if(inp) sw.style.backgroundColor = inp.value;
-                });
-            }
+            function resetToDefault() { CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); saveToStorage(); renderAll(); showToast('已重置','warning'); }
 
             function autoFixPosts() {
                 let changed=false;
-                POSTS.forEach(p=>{ if(!p.userId && p.username) { let c=findCharById(p.username); if(!c){ const nid=generateRandomId(); CHARACTERS.push({id:nid, name:p.username, aliases:[p.username], avatar:''}); p.userId=nid; } else p.userId=c.id; changed=true; } });
+                // 迁移：为没有 no 的帖子按数组位置赋值，同时将旧 index-based refNo 转为 no-based
+                POSTS.forEach((p,i)=>{
+                    if(p.no===undefined) { p.no=i; changed=true; }
+                    if(p.quote && p.quote.refNo>=0 && p.quote.refNo<POSTS.length) {
+                        const target=POSTS.find(t=>t.no===p.quote.refNo);
+                        if(!target) { p.quote.refNo=POSTS[p.quote.refNo]?POSTS[p.quote.refNo].no:p.quote.refNo; changed=true; }
+                    }
+                });
+                // 按 no 排序
+                const sorted=POSTS.slice().sort((a,b)=>a.no-b.no);
+                if(sorted.some((p,i)=>p!==POSTS[i])) { POSTS.length=0; POSTS.push(...sorted); changed=true; }
+                // 再次修正引用（排序后 refNo 应该已经是 no-based了，但旧数据需要）
+                POSTS.forEach(p=>{ if(p.quote&&p.quote.refNo>=0&&!findPostByNo(p.quote.refNo)) { p.quote.refNo=-1; changed=true; } });
+                POSTS.forEach(p=>{ if(!p.userId && p.username) { let c=findCharById(p.username); if(!c){ const nid=generateRandomId(); CHARACTERS.push({id:nid, name:p.username, aliases:[p.username], avatar:'', favorite:false}); p.userId=nid; } else p.userId=c.id; changed=true; } });
+                CHARACTERS.forEach(c=>{ if(c.favorite===undefined) { c.favorite=false; changed=true; } });
                 if(changed) saveToStorage();
             }
 
@@ -1020,13 +1113,13 @@
 
             function getAvatarSrc(char) {
                 if (char && char.avatar && (char.avatar.startsWith('data:') || char.avatar.startsWith('http'))) return char.avatar;
-                const bgColor = (CONFIG.avatarBg || '#fededf').replace('#', '%23');
+                const bgColor = '#fededf'.replace('#', '%23');
                 return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${bgColor}'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23ffffff'/%3E%3C/svg%3E`;
             }
 
-            function buildQuoteBlock(quote,refPost,refIndex) {
+            function buildQuoteBlock(quote,refPost,refNo) {
                 const c=document.createElement('div'); c.className='quote-container';
-                c.innerHTML=`<div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refIndex} ☆☆☆ ${escapeHtml(refPost.username||'==')}|${escapeHtml(refPost.userId||'????')} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
+                c.innerHTML=`<div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refNo} ☆☆☆ ${escapeHtml(refPost.username||'==')}|${escapeHtml(refPost.userId||'????')} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
                 return c;
             }
 
@@ -1040,14 +1133,41 @@
                 const pagePosts = POSTS.slice(start, end);
 
                 $postList.innerHTML='';
+
+                // 页首省略：与上一页最后一帖有跳跃
+                if (start > 0) {
+                    const prevNo = POSTS[start - 1].no;
+                    const currNo = pagePosts[0].no;
+                    if (currNo - prevNo > 1) {
+                        const gap = document.createElement('div');
+                        gap.className = 'floor-gap';
+                        gap.innerHTML = `<span class="floor-gap-text">Nº${prevNo + 1} ~ Nº${currNo - 1} 已隐藏</span><span class="floor-gap-more">点击查看更多</span>`;
+                        $postList.appendChild(gap);
+                    }
+                }
+
+                let prevNo = null;
                 pagePosts.forEach((p,idx)=>{
-                    const globalIdx = start + idx;
+                    const arrIdx = start + idx;
+
+                    // 帖间省略
+                    if (prevNo !== null && p.no - prevNo > 1) {
+                        const gap = document.createElement('div');
+                        gap.className = 'floor-gap';
+                        gap.innerHTML = `<span class="floor-gap-text">Nº${prevNo + 1} ~ Nº${p.no - 1} 已隐藏</span><span class="floor-gap-more">点击查看更多</span>`;
+                        $postList.appendChild(gap);
+                    }
+                    prevNo = p.no;
+
                     const d=document.createElement('div'); d.className='post-item';
                     const char = findCharById(p.userId);
                     const avatarSrc = getAvatarSrc(char);
-                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span><span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span></div><div class="time-row">Nº${globalIdx} ${escapeHtml(p.time)}</div></div><span class="more-btn">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${globalIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${globalIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${globalIdx}">✕ 删除</button></div>`;
+                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span><span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span></div><div class="time-row">Nº${p.no} ${escapeHtml(p.time)}</div></div><span class="more-btn">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${arrIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${arrIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${arrIdx}">✕ 删除</button></div>`;
                     const contentDiv=d.querySelector('.post-content');
-                    if(p.quote && p.quote.refNo>=0 && p.quote.refNo<POSTS.length) contentDiv.appendChild(buildQuoteBlock(p.quote, POSTS[p.quote.refNo], p.quote.refNo));
+                    if(p.quote && p.quote.refNo>=0){
+                        const refPost = findPostByNo(p.quote.refNo);
+                        if(refPost) contentDiv.appendChild(buildQuoteBlock(p.quote, refPost, p.quote.refNo));
+                    }
                     const body=document.createElement('div'); body.innerHTML=p.content; contentDiv.appendChild(body);
                     $postList.appendChild(d);
                 });
@@ -1125,6 +1245,23 @@
                 updateCropPosition();
             });
             window.addEventListener('mouseup', () => { isDragging = false; });
+
+            // touch 事件（移动端拖拽）
+            cropContainer.addEventListener('touchstart', (e) => {
+                if (!cropImageObj) return;
+                isDragging = true;
+                dragStartX = e.touches[0].clientX - cropOffsetX;
+                dragStartY = e.touches[0].clientY - cropOffsetY;
+                e.preventDefault();
+            });
+            window.addEventListener('touchmove', (e) => {
+                if (!isDragging || !cropImageObj) return;
+                cropOffsetX = e.touches[0].clientX - dragStartX;
+                cropOffsetY = e.touches[0].clientY - dragStartY;
+                updateCropPosition();
+                e.preventDefault();
+            });
+            window.addEventListener('touchend', () => { isDragging = false; });
 
             function getCroppedAvatar(callback) {
               if (!cropImageObj) return callback('');
@@ -1206,18 +1343,22 @@
             function updateCharListInModal(filter='') {
                 const cont=document.getElementById('charListContainer'); if(!cont) return;
                 const list=CHARACTERS.filter(c=>c.name.toLowerCase().includes(filter.toLowerCase())||c.id.includes(filter));
+                list.sort((a,b)=>(b.favorite?1:0)-(a.favorite?1:0));
                 if(!list.length) { cont.innerHTML='<p style="color:#999;font-size:13px;text-align:center;padding:16px;">无匹配角色</p>'; return; }
                 cont.innerHTML=list.map(ch=>{
                     const idx=CHARACTERS.indexOf(ch);
                     const avatarSrc = ch.avatar ? (ch.avatar.startsWith('data:')?ch.avatar:ch.avatar) : '';
-                    const avatarHtml = avatarSrc ? `<img src="${avatarSrc}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:8px;">` : `<div style="width:40px;height:40px;border-radius:50%;background:var(--avatar-bg);margin-right:8px;"></div>`;
-                    return `<div class="char-list-item" style="display:flex; align-items:center; gap:8px; padding:8px; border-bottom:1px solid #f5f5f5;">
-                        ${avatarHtml}
+                    const avatarHtml = avatarSrc ? `<img src="${avatarSrc}" style="width:40px;height:40px;border-radius:50%;object-fit:cover;margin-right:8px;cursor:pointer;">` : `<div style="width:40px;height:40px;border-radius:50%;background:var(--avatar-bg);margin-right:8px;cursor:pointer;"></div>`;
+                    const favBtn = ch.favorite ? '⭐收藏' : '☆收藏';
+                    return `<div class="char-list-item">
+                        <span data-avatar-char="${idx}" style="cursor:pointer;flex-shrink:0;">${avatarHtml}</span>
                         <span style="flex:1;"><b>${escapeHtml(ch.name)}</b> <small>${escapeHtml(ch.id)}</small><br><small style="color:#aaa;">别名: ${(ch.aliases||[]).join(', ')||'无'}</small></span>
-                        <button class="char-btn" data-avatar-char="${idx}">🖼 头像</button>
-                        <button class="char-btn" data-edit-char="${idx}">✎ 改名</button>
-                        <button class="char-btn" data-alias-char="${idx}">🏷️ 别名</button>
-                        <button class="char-btn danger-char" data-delete-char="${idx}">✕ 删除</button>
+                        <span class="char-actions">
+                            <button class="char-btn" data-edit-char="${idx}">✎ 改名</button>
+                            <button class="char-btn" data-fav-char="${idx}">${favBtn}</button>
+                            <button class="char-btn" data-alias-char="${idx}">🏷️ 别名</button>
+                            <button class="char-btn danger-char" data-delete-char="${idx}">✕ 删除</button>
+                        </span>
                     </div>`;
                 }).join('');
             }
@@ -1225,6 +1366,8 @@
             document.addEventListener('click',function(e){
                 const avatarBtn = e.target.closest('[data-avatar-char]');
                 if(avatarBtn){ const idx=parseInt(avatarBtn.getAttribute('data-avatar-char')); if(!isNaN(idx)) openAvatarModal(idx); return; }
+                const favBtn = e.target.closest('[data-fav-char]');
+                if(favBtn){ const idx=parseInt(favBtn.getAttribute('data-fav-char')); if(!isNaN(idx)){ CHARACTERS[idx].favorite=!CHARACTERS[idx].favorite; saveToStorage(); renderAll(); updateCharListInModal(document.getElementById('charSearch').value); } return; }
                 const editBtn=e.target.closest('[data-edit-char]');
                 const aliasBtn=e.target.closest('[data-alias-char]');
                 const delBtn=e.target.closest('[data-delete-char]');
@@ -1256,43 +1399,23 @@
                 const nm = document.getElementById('newCharName').value.trim() || '==';
                 const id = document.getElementById('newCharId').value.trim() || generateRandomId();
                 if(CHARACTERS.some(c=>c.id===id)){ showToast('ID重复','warning'); return; }
-                CHARACTERS.push({id, name:nm, aliases:[nm], avatar:''});
+                CHARACTERS.push({id, name:nm, aliases:[nm], avatar:'', favorite:false});
                 document.getElementById('newCharName').value=''; document.getElementById('newCharId').value='';
                 saveToStorage(); renderAll(); updateCharListInModal(); showToast(`已添加"${nm}"`);
             });
 
             // 配置编辑
-            function bindColorSwatches() {
-                document.querySelectorAll('.color-swatch-input').forEach(inp=>{
-                    inp.addEventListener('input', function(){ this.closest('.color-swatch').style.backgroundColor=this.value; });
-                });
-            }
             document.getElementById('btnSaveConfig').addEventListener('click',()=>{
                 CONFIG.boardName=document.getElementById('cfgBoardName').value.trim()||CONFIG.boardName;
                 CONFIG.boardId=document.getElementById('cfgBoardId').value.trim()||CONFIG.boardId;
                 CONFIG.threadTitle=document.getElementById('cfgThreadTitle').value.trim()||CONFIG.threadTitle;
-                CONFIG.pageBg=document.getElementById('cfgPageBg').value;
-                CONFIG.primaryBg=document.getElementById('cfgPrimaryBg').value;
-                CONFIG.headerBg=document.getElementById('cfgHeaderBg').value;
-                CONFIG.quoteBg=document.getElementById('cfgQuoteBg').value;
-                CONFIG.usernameColor=document.getElementById('cfgUsernameColor').value;
-                CONFIG.highlightColor=document.getElementById('cfgHighlightColor').value;
-                CONFIG.avatarBg=document.getElementById('cfgAvatarBg').value;
-                applyConfigColors(); saveToStorage(); renderAll(); closeModal('modalConfigOverlay');
+                saveToStorage(); renderAll(); closeModal('modalConfigOverlay');
                 showToast('配置已保存','success');
             });
             function populateConfigModal() {
                 document.getElementById('cfgBoardName').value=CONFIG.boardName;
                 document.getElementById('cfgBoardId').value=CONFIG.boardId;
                 document.getElementById('cfgThreadTitle').value=CONFIG.threadTitle;
-                document.getElementById('cfgPageBg').value=CONFIG.pageBg||'#f5f5f5';
-                document.getElementById('cfgPrimaryBg').value=CONFIG.primaryBg||'#ffffff';
-                document.getElementById('cfgHeaderBg').value=CONFIG.headerBg||'#fedbef';
-                document.getElementById('cfgQuoteBg').value=CONFIG.quoteBg||'#fcf3f6';
-                document.getElementById('cfgUsernameColor').value=CONFIG.usernameColor||'#c24949';
-                document.getElementById('cfgHighlightColor').value=CONFIG.highlightColor||'#c24949';
-                document.getElementById('cfgAvatarBg').value=CONFIG.avatarBg|| '#fededf';
-                updateColorSwatches();
             }
 
             // 角色搜索与别名（整合确认角色功能）
@@ -1302,9 +1425,16 @@
             function updateCharSearchList(filter='') {
                 const listDiv=document.getElementById('charSearchList');
                 if(!listDiv) return;
-                const f=filter.toLowerCase();
-                const filtered=CHARACTERS.map((c,i)=>({...c,idx:i})).filter(c=>c.name.toLowerCase().includes(f)||c.id.includes(f));
-                listDiv.innerHTML=filtered.map(c=>`<div class="search-select-option" data-idx="${c.idx}">${escapeHtml(c.name)} | ${escapeHtml(c.id)}</div>`).join('');
+                const f=filter.toLowerCase().trim();
+                const all=CHARACTERS.map((c,i)=>({c:c,idx:i})).sort((a,b)=>(b.c.favorite?1:0)-(a.c.favorite?1:0));
+                if(!f){
+                    listDiv.innerHTML=all.map(item=>`<div class="search-select-option" data-idx="${item.idx}">${escapeHtml(item.c.name)} | ${escapeHtml(item.c.id)}${item.c.favorite?' ⭐':''}</div>`).join('');
+                    if(!CHARACTERS.length) listDiv.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
+                    return;
+                }
+                var searchParts = f.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+                const filtered=all.filter(item=>searchParts.some(part=>item.c.name.toLowerCase().indexOf(part)!==-1||item.c.id.indexOf(part)!==-1));
+                listDiv.innerHTML=filtered.map(item=>`<div class="search-select-option" data-idx="${item.idx}">${escapeHtml(item.c.name)} | ${escapeHtml(item.c.id)}${item.c.favorite?' ⭐':''}</div>`).join('');
                 if(!filtered.length) listDiv.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
             }
 
@@ -1312,7 +1442,10 @@
                 const input = document.getElementById('charSearchInput').value.trim();
                 const btn = document.getElementById('btnCharConfirm');
                 if (!input) { btn.classList.add('disabled'); btn.disabled = true; return; }
-                const matched = CHARACTERS.some(c => c.name === input || c.id === input);
+                var parts = input.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+                const matched = CHARACTERS.some(function(c){
+                    return parts.some(function(p){ return c.name === p || c.id === p; });
+                });
                 if (matched) {
                     btn.classList.add('disabled');
                     btn.disabled = true;
@@ -1338,8 +1471,6 @@
                 const ch = CHARACTERS[idx];
                 document.getElementById('charSearchInput').value = `${ch.name} | ${ch.id}`;
                 document.getElementById('charSearchList').classList.remove('open');
-                // 显示别名区，隐藏指定ID区
-                document.getElementById('groupCustomId').style.display = 'none';
                 document.getElementById('aliasSearchInput').value = '';
                 selectedAlias = '';
                 updateAliasSearchList('');
@@ -1347,19 +1478,30 @@
                 updateCharConfirmButton();
             });
 
-            // 确认角色按钮：新建角色
+            // 确认角色按钮：新建角色（立即创建）
             document.getElementById('btnCharConfirm').addEventListener('click', function() {
                 if (this.disabled) return;
                 const name = document.getElementById('charSearchInput').value.trim();
                 if (!name) return;
-                // 标记为未选择已有角色，显示指定ID区
-                selectedCharIndex = -1;
-                selectedAlias = '';
-                document.getElementById('aliasSearchInput').value = '';
-                document.getElementById('groupCustomId').style.display = 'block';
-                updateAliasConfirmButton();
+                const customId = document.getElementById('postCustomId').value.trim();
+                const newId = customId || generateRandomId();
+                if (CHARACTERS.some(c => c.id === newId)) {
+                    showToast('ID重复，请重新输入', 'warning');
+                    return;
+                }
+                const newChar = { id: newId, name: name, aliases: [name], avatar: '', favorite: false };
+                CHARACTERS.push(newChar);
+                selectedCharIndex = CHARACTERS.indexOf(newChar);
+                selectedAlias = name;
+                document.getElementById('aliasSearchInput').value = name;
+                document.getElementById('charSearchInput').value = `${name} | ${newId}`;
+                document.getElementById('postCustomId').value = '';
                 updateCharConfirmButton();
-                showToast('新角色已就绪，请完善ID和别名', 'success');
+                updateAliasConfirmButton();
+                updateAliasSearchList('');
+                updateCharListInModal();
+                saveToStorage();
+                showToast('角色已创建', 'success');
             });
 
             // 别名区域逻辑
@@ -1422,29 +1564,92 @@
                 }
             });
 
-            // 引用搜索
+            // 引用搜索（模糊匹配 + 关键词高亮 + 统一格式）
             function setupRefSearch() {
-                const search=document.getElementById('refSearchInput');
-                const list=document.getElementById('refList');
-                const hidden=document.getElementById('postQuoteRef');
-                const display=document.getElementById('refSelectedDisplay');
-                let postsRev=[];
-                function refresh(){ postsRev=POSTS.map((p,i)=>({...p,idx:i})).reverse(); renderList(); }
-                function renderList(f=''){
-                    const fl=f.toLowerCase();
-                    const filtered=postsRev.filter(p=>String(p.idx).includes(fl)||stripHtml(p.content).toLowerCase().includes(fl));
-                    list.innerHTML=filtered.map(p=>`<div class="search-select-option" data-idx="${p.idx}">Nº${p.idx} - ${escapeHtml(p.username||'==')}: ${escapeHtml(truncateText(p.content,40))}</div>`).join('');
-                    if(!filtered.length) list.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
+                const search = document.getElementById('refSearchInput');
+                const list = document.getElementById('refList');
+                const hidden = document.getElementById('postQuoteRef');
+                const clearBtn = document.getElementById('refClearBtn');
+                let postsRev = [];
+
+                function refresh() { postsRev = POSTS.map((p, i) => ({ ...p, arrIdx: i })).reverse(); renderList(); }
+
+                function highlightText(text, query) {
+                    if (!query) return escapeHtml(text);
+                    const escaped = escapeHtml(text);
+                    const q = query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                    return escaped.replace(new RegExp('(' + q + ')', 'gi'), '<mark>$1</mark>');
                 }
-                search.addEventListener('focus',()=>{ list.classList.add('open'); refresh(); });
-                search.addEventListener('blur',()=>setTimeout(()=>list.classList.remove('open'),150));
-                search.addEventListener('input',()=>renderList(search.value));
-                list.addEventListener('click',function(e){
-                    const opt=e.target.closest('.search-select-option'); if(!opt||opt.getAttribute('data-idx')===null) return;
-                    const idx=opt.getAttribute('data-idx'); hidden.value=idx;
-                    display.textContent=`已选择: Nº${idx} - ${POSTS[idx].username||'=='} (${truncateText(POSTS[idx].content,30)})`;
-                    search.value=''; list.classList.remove('open'); renderList();
+
+                function renderList(f) {
+                    f = f || '';
+                    const fl = f.toLowerCase().trim();
+                    let filtered;
+                    if (!fl) {
+                        filtered = postsRev.slice();
+                    } else {
+                        filtered = postsRev.filter(p =>
+                            String(p.no).includes(fl) ||
+                            stripHtml(p.content).toLowerCase().includes(fl)
+                        );
+                    }
+                    list.innerHTML = filtered.map(p => {
+                        const snippet = getSearchSnippet(p.content, fl);
+                        const idxStr = 'Nº' + p.no;
+                        const nameStr = escapeHtml(p.username || '==');
+                        const highlighted = highlightText(snippet, fl);
+                        return '<div class="search-select-option" data-idx="' + p.arrIdx + '">' + idxStr + ' — ' + nameStr + ': ' + highlighted + '</div>';
+                    }).join('');
+                    if (!filtered.length) list.innerHTML = '<div class="search-select-option" style="color:#999;">无匹配</div>';
+                }
+
+                search.addEventListener('focus', function () {
+                    if (search.dataset.hasSelection === 'true') {
+                        search.value = '';
+                        delete search.dataset.hasSelection;
+                        clearBtn.style.display = 'none';
+                    }
+                    list.classList.add('open');
+                    refresh();
                 });
+                search.addEventListener('blur', function () {
+                    setTimeout(function () {
+                        list.classList.remove('open');
+                        if (hidden.value !== '-1' && !search.value.trim()) {
+                            var idx = parseInt(hidden.value);
+                            var p = POSTS[idx];
+                            var preview = getSearchSnippet(p.content, '', 15);
+                            search.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
+                            search.dataset.hasSelection = 'true';
+                            clearBtn.style.display = 'block';
+                        }
+                    }, 150);
+                });
+                search.addEventListener('input', function () { renderList(search.value); });
+
+                list.addEventListener('click', function (e) {
+                    var opt = e.target.closest('.search-select-option');
+                    if (!opt || opt.getAttribute('data-idx') === null) return;
+                    var idx = parseInt(opt.getAttribute('data-idx'));
+                    hidden.value = idx;
+                    var p = POSTS[idx];
+                    var preview = getSearchSnippet(p.content, '', 15);
+                    search.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
+                    search.dataset.hasSelection = 'true';
+                    clearBtn.style.display = 'block';
+                    list.classList.remove('open');
+                    renderList();
+                });
+
+                clearBtn.addEventListener('click', function (e) {
+                    e.stopPropagation();
+                    hidden.value = '-1';
+                    search.value = '';
+                    delete search.dataset.hasSelection;
+                    clearBtn.style.display = 'none';
+                    renderList();
+                });
+
                 refresh();
             }
 
@@ -1455,37 +1660,56 @@
                 document.getElementById('charSearchInput').value = '';
                 document.getElementById('aliasSearchInput').value = '';
                 document.getElementById('postCustomId').value = '';
-                document.getElementById('groupCustomId').style.display = 'block'; // 默认新建，显示ID区
                 updateCharConfirmButton();
                 updateAliasConfirmButton();
 
                 document.getElementById('postEditIndex').value=postIdx;
-                document.getElementById('modalPostTitle').textContent=postIdx>=0?`编辑楼层 Nº${postIdx}`:'添加新楼层';
+                const floorNoInput=document.getElementById('postFloorNo');
                 const qHidden=document.getElementById('postQuoteRef');
                 const time=document.getElementById('postTime');
                 const content=document.getElementById('postContent');
                 const refSearch=document.getElementById('refSearchInput');
+                const refClearBtn=document.getElementById('refClearBtn');
                 if(postIdx>=0 && postIdx<POSTS.length){
                     const p=POSTS[postIdx];
+                    document.getElementById('modalPostTitle').textContent=`编辑楼层 Nº${p.no}`;
+                    document.getElementById('floorNoHint').textContent='可跳过';
+                    floorNoInput.value=p.no;
                     if(p.userId && findCharById(p.userId)){
                         const ch = findCharById(p.userId);
                         selectedCharIndex = CHARACTERS.indexOf(ch);
                         document.getElementById('charSearchInput').value = `${ch.name} | ${ch.id}`;
                         document.getElementById('aliasSearchInput').value = p.username || ch.name;
                         selectedAlias = p.username || ch.name;
-                        document.getElementById('groupCustomId').style.display = 'none'; // 已有角色隐藏ID区
                     } else {
                         document.getElementById('charSearchInput').value = p.username || '';
-                        document.getElementById('groupCustomId').style.display = 'block';
                     }
-                    qHidden.value=(p.quote&&p.quote.refNo>=0)?p.quote.refNo:-1;
+                    // refNo 现在是 no 值，需转为数组下标
+                    if(p.quote&&p.quote.refNo>=0){
+                        const refPost=findPostByNo(p.quote.refNo);
+                        qHidden.value=refPost?POSTS.indexOf(refPost):-1;
+                    } else { qHidden.value=-1; }
                     time.value=p.time; content.value=p.content;
                 } else {
+                    const nextNo=getNextFloorNo();
+                    document.getElementById('modalPostTitle').textContent='添加新楼层';
+                    document.getElementById('floorNoHint').textContent=`下一楼 Nº${nextNo}（可跳过）`;
+                    floorNoInput.value='';
                     qHidden.value=quotePreset>=0?quotePreset:-1;
                     time.value=nowTimeStr(); content.value='';
                 }
-                document.getElementById('refSelectedDisplay').textContent=qHidden.value!=='-1'?`已选择: Nº${qHidden.value}`:'未选择引用';
-                if(refSearch) refSearch.value='';
+                if (qHidden.value !== '-1' && parseInt(qHidden.value) >= 0 && parseInt(qHidden.value) < POSTS.length) {
+                    var qIdx = parseInt(qHidden.value);
+                    var p = POSTS[qIdx];
+                    var preview = getSearchSnippet(p.content, '', 15);
+                    refSearch.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
+                    refSearch.dataset.hasSelection = 'true';
+                    refClearBtn.style.display = 'block';
+                } else {
+                    refSearch.value = '';
+                    delete refSearch.dataset.hasSelection;
+                    refClearBtn.style.display = 'none';
+                }
                 updateAliasConfirmButton();
                 updateCharConfirmButton();
             }
@@ -1497,6 +1721,21 @@
                 let content=document.getElementById('postContent').value;
                 if(!content||!time){ showToast('填写内容和时间','warning'); return; }
                 content = content.replace(/\n/g, '<br>');
+
+                // 读取楼层号
+                const floorNoInput=document.getElementById('postFloorNo');
+                let floorNo;
+                if(floorNoInput.value.trim()===''){
+                    floorNo = postIdx>=0 ? POSTS[postIdx].no : getNextFloorNo();
+                } else {
+                    floorNo = parseInt(floorNoInput.value, 10);
+                    if(!Number.isInteger(floorNo)||floorNo<0){ showToast('楼层号需为非负整数','warning'); return; }
+                    // 检查冲突
+                    const existing=findPostByNo(floorNo);
+                    if(existing && (postIdx<0 || POSTS[postIdx]!==existing)){
+                        showToast(`楼层号 Nº${floorNo} 已存在`,'warning'); return;
+                    }
+                }
 
                 let userId, username = '==';
 
@@ -1517,7 +1756,7 @@
                         showToast('ID重复，请重新输入', 'warning');
                         return;
                     }
-                    const newChar = { id: userId, name: username, aliases: [username], avatar: '' };
+                    const newChar = { id: userId, name: username, aliases: [username], avatar: '', favorite: false };
                     const aliasInput = document.getElementById('aliasSearchInput').value.trim();
                     if (aliasInput && aliasInput !== username && !newChar.aliases.includes(aliasInput)) {
                         newChar.aliases.push(aliasInput);
@@ -1525,15 +1764,33 @@
                     CHARACTERS.push(newChar);
                 }
 
-                const obj = { userId, username, time, content };
+                const obj = { no:floorNo, userId, username, time, content };
+                // refNo 改为存储被引用帖子的 no 值
                 if (!isNaN(qRef) && qRef >= 0 && qRef < POSTS.length) {
-                    obj.quote = { refNo: qRef, refContent: POSTS[qRef].content };
+                    obj.quote = { refNo: POSTS[qRef].no, refContent: POSTS[qRef].content };
                 }
                 if (postIdx >= 0) POSTS[postIdx] = obj;
                 else POSTS.push(obj);
+                // 按 no 排序
+                POSTS.sort((a,b)=>a.no-b.no);
 
-                saveToStorage(); closeModal('modalPostOverlay'); adjustPageAfterChange(); renderAll();
-                showToast(postIdx >= 0 ? `楼层 Nº${postIdx} 已更新` : '新楼层已添加', 'success');
+                saveToStorage();
+                // 编辑模式：提示同步引用内容
+                if (postIdx >= 0) {
+                    const refs = POSTS.filter(p => p.quote && p.quote.refNo === floorNo);
+                    if (refs.length > 0 && confirm(`Nº${floorNo} 被 ${refs.length} 个楼层引用，是否同步更新引用内容？`)) {
+                        refs.forEach(p => { p.quote.refContent = content; });
+                        saveToStorage();
+                    }
+                }
+                closeModal('modalPostOverlay'); adjustPageAfterChange(); renderAll();
+                showToast(postIdx >= 0 ? `楼层 Nº${floorNo} 已更新` : `Nº${floorNo} 已添加`,'success');
+            });
+
+            // 此楼层不可见 模板按钮
+            document.getElementById('btnHiddenPost').addEventListener('click',()=>{
+                document.getElementById('postContent').value='<div style="color:#cc3333;font-size:15px;padding:12px 0;">*此楼层不可见*</div>';
+                document.getElementById('btnSavePost').click();
             });
 
             // 静态导出（内嵌分页，20层/页）
@@ -1544,13 +1801,13 @@
 
                 return `<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>${escapeHtml(CONFIG.threadTitle)}</title><style>
         :root{
-            --page-bg:${CONFIG.pageBg || '#f5f5f5'};
-            --primary-bg:${CONFIG.primaryBg || '#ffffff'};
-            --header-bg:${CONFIG.headerBg || '#fedbef'};
-            --quote-bg:${CONFIG.quoteBg || '#fcf3f6'};
-            --highlight-color:${CONFIG.highlightColor || '#c24949'};
-            --username-color:${CONFIG.usernameColor || '#c24949'};
-            --avatar-bg:${CONFIG.avatarBg || '#fededf'};
+            --page-bg:#f5f5f5;
+            --primary-bg:#ffffff;
+            --header-bg:#fedbef;
+            --quote-bg:#fcf3f6;
+            --highlight-color:#c24949;
+            --username-color:#c24949;
+            --avatar-bg:#fededf;
             --border-color:#e0e0e0;
             --post-separator:#f0f0f0;
             --text-primary:#333;
@@ -1575,12 +1832,16 @@
         .username{font-weight:500}.user-id-separator{color:var(--userid-color);font-size:13px;font-family:monospace}
         .user-id{color:var(--userid-color);font-size:13px;font-family:monospace}.time-row{font-size:12px;color:var(--text-time);margin-top:2px}
         .more-btn{position:absolute;top:12px;right:16px;color:#555;font-size:22px;font-weight:bold;cursor:pointer}
-        .post-content{font-size:14px;line-height:1.6;color:var(--text-primary);padding-right:24px}
+        .post-content{font-size:14px;line-height:1.6;color:var(--text-primary);padding-right:0px}
         .highlight{color:var(--highlight-color);font-weight:500}
         .quote-container{background:var(--quote-bg);border-radius:4px;padding:12px;margin:0 0 10px}
         .quote-header{font-size:14px;color:#666;cursor:pointer;display:flex;align-items:center}
         .quote-content{margin:8px 0;font-size:14px;color:#444;line-height:1.5}.is-hidden{display:none}
-        .inner-post-footer{font-size:13px;color:#666;margin-top:6px}.collapse-btn{font-size:14px;color:#444;cursor:pointer;margin-top:2px}
+        .inner-post-footer{font-size:13px;color:#666;margin-top:6px}.collapse-btn{font-size:14px;color:#444;cursor:pointer;margin-top:2px}.quote-bottom-msg{font-size:14px;color:#444;margin-top:6px}
+        .floor-gap{display:flex;align-items:center;gap:12px;padding:14px 20px;color:#bbb;font-size:13px;user-select:none;border-bottom:1px solid var(--post-separator)}
+        .floor-gap::before,.floor-gap::after{content:'';flex:1;height:0;border-top:1px dashed #e0d0d6}
+        .floor-gap-text{white-space:nowrap;color:#c0a0ae;font-style:italic}
+        .floor-gap-more{white-space:nowrap;color:#d4b0be;font-size:12px;cursor:default;text-decoration:underline;text-decoration-style:dotted;text-underline-offset:3px}
         .pagination-separator{border-top:1px solid var(--post-separator);margin:0 16px}
         .pagination{display:flex;justify-content:center;align-items:center;gap:24px;padding:12px 16px;font-size:14px;color:#666}
         .pagination-btn{background:var(--header-bg);border:1px solid #e0c0cc;border-radius:14px;padding:5px 16px;font-size:13px;color:#8b4a5e;cursor:pointer;transition:all 0.2s;font-weight:500}
@@ -1601,9 +1862,10 @@
         var curPage = 0;
         function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
         function findCharById(id){ return CHARS.find(function(c){return c.id===id;}); }
+        function findPostByNo(n){ return POSTS.find(function(p){return p.no===n;}); }
         function getAvatar(c){
             if(c&&c.avatar&&(c.avatar.startsWith('data:')||c.avatar.startsWith('http'))) return c.avatar;
-            var bg = (CONFIG.avatarBg || '#fededf').replace('#','%23');
+            var bg = '#fededf'.replace('#','%23');
             return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='"+bg+"'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23ffffff'/%3E%3C/svg%3E";
         }
         function renderPage(p){
@@ -1611,12 +1873,29 @@
             if(p<0)p=0; if(p>=total)p=total-1; curPage=p;
             var start = p*PER_PAGE, end = Math.min(start+PER_PAGE, POSTS.length);
             var list = document.getElementById('staticPostList'); list.innerHTML='';
+
+            // 页首省略
+            if(start>0){
+                var prevNo=POSTS[start-1].no, currNo=POSTS[start].no;
+                if(currNo-prevNo>1){
+                    list.innerHTML+='<div class="floor-gap"><span class="floor-gap-text">N'+String(prevNo+1)+' ~ N'+String(currNo-1)+' 已隐藏</span><span class="floor-gap-more">点击查看更多</span></div>';
+                }
+            }
+
+            var prevNo=null;
             for(var i=start;i<end;i++){
                 var post=POSTS[i], char=findCharById(post.userId), av=getAvatar(char);
-                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span><span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span></div><div class="time-row">N'+i+' '+escapeHtml(post.time)+'</div></div><span class="more-btn">...</span></div><div class="post-content">';
-                if(post.quote&&post.quote.refNo>=0&&post.quote.refNo<POSTS.length){
-                    var r=POSTS[post.quote.refNo];
-                    html+='<div class="quote-container"><div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">N'+post.quote.refNo+' ☆☆☆ '+escapeHtml(r.username||'==')+'|'+escapeHtml(r.userId||'?')+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>';
+
+                // 帖间省略
+                if(prevNo!==null && post.no-prevNo>1){
+                    list.innerHTML+='<div class="floor-gap"><span class="floor-gap-text">N'+String(prevNo+1)+' ~ N'+String(post.no-1)+' 已隐藏</span><span class="floor-gap-more">点击查看更多</span></div>';
+                }
+                prevNo=post.no;
+
+                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span><span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span></div><div class="time-row">N'+String(post.no)+' '+escapeHtml(post.time)+'</div></div><span class="more-btn">...</span></div><div class="post-content">';
+                if(post.quote&&post.quote.refNo>=0){
+                    var r=findPostByNo(post.quote.refNo);
+                    if(r) html+='<div class="quote-container"><div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">N'+String(post.quote.refNo)+' ☆☆☆ '+escapeHtml(r.username||'==')+'|'+escapeHtml(r.userId||'?')+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>';
                 }
                 html+='<div>'+post.content+'</div></div></div>';
                 list.innerHTML+=html;
@@ -1627,7 +1906,7 @@
         }
         document.getElementById('staticPrev').addEventListener('click',function(){ if(curPage>0)renderPage(curPage-1); });
         document.getElementById('staticNext').addEventListener('click',function(){ var t=Math.ceil(POSTS.length/PER_PAGE)||1; if(curPage<t-1)renderPage(curPage+1); });
-        document.querySelectorAll('.quote-header, .collapse-btn').forEach(function(el){ el.addEventListener('click',function(){ var c=this.closest('.quote-container'); if(!c)return; var cnt=c.querySelector('.quote-content'); var hl=c.querySelector('.history-label'); var tt=c.querySelector('.toggle-text'); var bm=c.querySelector('.quote-bottom-msg'); if(cnt.classList.contains('is-hidden')){ cnt.classList.remove('is-hidden'); if(hl)hl.style.display='none'; if(tt)tt.style.display='none'; if(bm)bm.style.display='none'; }else{ cnt.classList.add('is-hidden'); if(hl)hl.style.display='inline'; if(tt){tt.style.display='inline';tt.textContent='展开全部 ▼';} if(bm)bm.style.display='block'; } }); });
+        document.getElementById('staticPostList').addEventListener('click',function(e){ var h=e.target.closest('.quote-header'); var col=e.target.closest('.collapse-btn'); if(!h&&!col)return; var c=(h||col).closest('.quote-container'); if(!c)return; var cnt=c.querySelector('.quote-content'); var hl=c.querySelector('.history-label'); var tt=c.querySelector('.toggle-text'); var bm=c.querySelector('.quote-bottom-msg'); if(cnt.classList.contains('is-hidden')){ cnt.classList.remove('is-hidden'); if(hl)hl.style.display='none'; if(tt)tt.style.display='none'; if(bm)bm.style.display='none'; }else{ cnt.classList.add('is-hidden'); if(hl)hl.style.display='inline'; if(tt){tt.style.display='inline';tt.textContent='展开全部 ▼';} if(bm)bm.style.display='block'; } });
         renderPage(0);
     <\/script></body></html>`;
             }
@@ -1670,13 +1949,11 @@
             }
             document.getElementById('btnImportFile').addEventListener('click', ()=>{
                 if (!pendingImportData) { showToast('请先选择JSON文件','warning'); return; }
-                const importCfg = document.getElementById('importConfig').checked;
-                const importDat = document.getElementById('importData').checked;
-                if (!importCfg && !importDat) { showToast('至少选择一项导入','warning'); return; }
                 let changes = false;
-                if (importCfg && pendingImportData.config) { CONFIG = pendingImportData.config; changes = true; }
-                if (importDat) { if(pendingImportData.characters) { CHARACTERS = pendingImportData.characters; changes = true; } if(pendingImportData.posts) { POSTS = pendingImportData.posts; changes = true; } }
-                if (changes) { applyConfigColors(); saveToStorage(); renderAll(); showToast('导入成功','success'); }
+                if (pendingImportData.config) { CONFIG = pendingImportData.config; changes = true; }
+                if (pendingImportData.characters) { CHARACTERS = pendingImportData.characters; changes = true; }
+                if (pendingImportData.posts) { POSTS = pendingImportData.posts; changes = true; }
+                if (changes) { saveToStorage(); renderAll(); showToast('导入成功','success'); }
                 else { showToast('未找到对应数据','warning'); }
                 pendingImportData = null; fileLabel.textContent = '点击选择 JSON 文件或拖拽到此处';
             });
@@ -1694,14 +1971,29 @@
                 const idx=parseInt(act.getAttribute('data-index')); if(isNaN(idx)) return;
                 if(act.getAttribute('data-action')==='edit'){ populatePostForm(idx); openModal('modalPostOverlay'); }
                 else if(act.getAttribute('data-action')==='reply'){ populatePostForm(-1,idx); openModal('modalPostOverlay'); }
-                else if(act.getAttribute('data-action')==='delete'){ if(confirm(`删除 Nº${idx}？`)){ POSTS.forEach(p=>{if(p.quote){if(p.quote.refNo===idx)p.quote.refNo=-1; else if(p.quote.refNo>idx)p.quote.refNo--;}}); POSTS.splice(idx,1); saveToStorage(); adjustPageAfterChange(); showToast('已删除','warning'); } }
+                else if(act.getAttribute('data-action')==='delete'){
+                    const delPost=POSTS[idx]; const delNo=delPost?delPost.no:idx;
+                    // 递归收集所有引用该楼的回复
+                    const toDelete=new Set(); toDelete.add(idx);
+                    (function collect(no){ POSTS.forEach((p,i)=>{ if(p.quote&&p.quote.refNo===no&&!toDelete.has(i)){ toDelete.add(i); collect(p.no); } }); })(delNo);
+                    const count=toDelete.size;
+                    if(!confirm(count>1?`删除 Nº${delNo} 及其 ${count-1} 条回复？`:`删除 Nº${delNo}？`)) return;
+                    // 按索引降序删除
+                    [...toDelete].sort((a,b)=>b-a).forEach(i=>POSTS.splice(i,1));
+                    // 重排编号
+                    POSTS.sort((a,b)=>a.no-b.no);
+                    const oldToNew={}; POSTS.forEach((p,i)=>{ oldToNew[p.no]=i; p.no=i; });
+                    // 更新 refNo
+                    POSTS.forEach(p=>{ if(p.quote&&p.quote.refNo>=0&&oldToNew[p.quote.refNo]!==undefined) p.quote.refNo=oldToNew[p.quote.refNo]; });
+                    saveToStorage(); adjustPageAfterChange(); showToast(`已删除 ${count} 条`,'warning');
+                }
             });
 
             document.addEventListener('keydown',e=>{ if(e.ctrlKey&&e.key==='n'){ e.preventDefault(); populatePostForm(-1); openModal('modalPostOverlay'); } if(e.ctrlKey&&e.key==='s'){ e.preventDefault(); saveToStorage(); showToast('已保存'); } });
 
             function init(){
                 if(!loadFromStorage()){ CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); }
-                applyConfigColors(); autoFixPosts(); setupRefSearch(); bindColorSwatches(); renderAll();
+                autoFixPosts(); setupRefSearch(); renderAll();
             }
             init();
         })();
