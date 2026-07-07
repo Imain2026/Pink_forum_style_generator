@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>粉红论坛体 - 最终版</title>
     <link rel="stylesheet" href="theme.css">
 </head>
@@ -15,7 +15,7 @@
                     <span class="header-title" id="boardTitle"></span>
                     <span class="header-id" id="boardId"></span>
                 </div>
-                <span class="menu-icon">
+                <span class="menu-icon" aria-hidden="true">
                     <span class="bar"></span><span class="bar"></span><span class="bar"></span>
                 </span>
             </div>
@@ -44,15 +44,15 @@
         </div>
     </div>
 
-    <div class="toast" id="toast"></div>
+    <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
     <!-- 角色管理 -->
     <div class="modal-overlay" id="modalCharsOverlay">
-        <div class="modal" id="modalChars">
-            <h3>👤 角色库管理</h3>
+        <div class="modal" id="modalChars" role="dialog" aria-modal="true" aria-labelledby="modalCharsTitle">
+            <h3 id="modalCharsTitle">👤 角色库管理</h3>
             <div id="charListContainer"></div>
             <div class="form-group" style="margin-top:10px;">
-                <input type="text" id="charSearch" placeholder="搜索角色（昵称或ID）">
+                <label for="charSearch" style="display:none;">搜索角色</label><input type="text" id="charSearch" placeholder="搜索角色（昵称或ID）">
             </div>
             <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
                 <div class="form-row">
@@ -66,8 +66,8 @@
 
     <!-- 配置编辑 -->
     <div class="modal-overlay" id="modalConfigOverlay">
-        <div class="modal" id="modalConfig">
-            <h3>⚙ 编辑板块配置</h3>
+        <div class="modal" id="modalConfig" role="dialog" aria-modal="true" aria-labelledby="modalConfigTitle">
+            <h3 id="modalConfigTitle">⚙ 编辑板块配置</h3>
             <div class="form-group"><label>板块名称</label><input type="text" id="cfgBoardName"></div>
             <div class="form-group"><label>板块ID</label><input type="text" id="cfgBoardId"></div>
             <div class="form-group"><label>帖子标题</label><input type="text" id="cfgThreadTitle"></div>
@@ -94,7 +94,7 @@
 
     <!-- 楼层编辑 (已重构：统一角色选择/新建) -->
     <div class="modal-overlay" id="modalPostOverlay">
-        <div class="modal" id="modalPost">
+        <div class="modal" id="modalPost" role="dialog" aria-modal="true" aria-labelledby="modalPostTitle">
             <h3 id="modalPostTitle">编辑楼层</h3>
             <input type="hidden" id="postEditIndex" value="-1">
 
@@ -153,19 +153,19 @@
 
     <!-- 导入导出 -->
     <div class="modal-overlay" id="modalImportExportOverlay">
-        <div class="modal" id="modalImportExport">
-            <h3>📤 导入 / 导出</h3>
+        <div class="modal" id="modalImportExport" role="dialog" aria-modal="true" aria-labelledby="modalImportExportTitle">
+            <h3 id="modalImportExportTitle">📤 导入 / 导出</h3>
             <div style="margin-bottom:20px;"><h4 style="font-size:15px;color:#8b4a5e;margin-bottom:10px;">⬇️ 导出</h4><div class="checkbox-group"><label class="checkbox-item"><input type="checkbox" id="exportConfig" checked> 配置</label><label class="checkbox-item"><input type="checkbox" id="exportData" checked> 数据（帖子+角色）</label></div><div class="form-actions" style="justify-content:flex-start;"><button class="btn-primary" id="btnExportFile">📤 导出JSON</button></div></div>
-            <div style="border-top:1px solid #eee;padding-top:20px;"><h4 style="font-size:15px;color:var(--btn-text);margin-bottom:10px;">⬆️ 导入</h4><div class="file-upload-area" id="fileUploadArea"><span id="fileUploadLabel">点击选择 JSON 文件或拖拽到此处</span><input type="file" id="importFileInput" accept=".json"></div><div class="form-actions" style="justify-content:flex-start;"><button class="btn-primary" id="btnImportFile">📥 导入JSON</button></div></div>
+            <div style="border-top:1px solid #eee;padding-top:20px;"><h4 style="font-size:15px;color:var(--btn-text);margin-bottom:10px;">⬆️ 导入</h4><div class="file-upload-area" id="fileUploadArea"><span id="fileUploadLabel">点击选择 JSON 文件或拖拽到此处</span><input type="file" id="importFileInput" accept=".json" aria-labelledby="fileUploadLabel"></div><div class="form-actions" style="justify-content:flex-start;"><button class="btn-primary" id="btnImportFile">📥 导入JSON</button></div></div>
             <div class="form-actions"><button class="btn-secondary" data-close="modalImportExportOverlay">关闭</button></div>
         </div>
     </div>
 
     <!-- 头像设置（仅本地文件上传） -->
     <div class="modal-overlay" id="modalAvatarOverlay">
-        <div class="modal" id="modalAvatar" style="max-width:420px;">
-            <span class="modal-close" data-close="modalAvatarOverlay">✕</span>
-            <h3>🖼 设置头像</h3>
+        <div class="modal" id="modalAvatar" style="max-width:420px;" role="dialog" aria-modal="true" aria-labelledby="modalAvatarTitle">
+            <span class="modal-close" data-close="modalAvatarOverlay" aria-label="关闭">✕</span>
+            <h3 id="modalAvatarTitle">🖼 设置头像</h3>
             <input type="hidden" id="avatarCharIndex" value="-1">
             <div style="text-align:center;margin-bottom:12px;">拖动图片调整裁剪位置</div>
             <div class="crop-container" id="cropContainer">
@@ -176,7 +176,7 @@
               <input type="range" id="cropZoom" min="0.1" max="8" step="0.1" value="1" style="width:200px;vertical-align:middle;margin-left:8px;">
             </div>
             <div class="form-group">
-                <label>上传本地图片</label>
+                <label for="avatarFile">上传本地图片</label>
                 <input type="file" id="avatarFile" accept="image/*">
             </div>
             <div class="form-actions" style="justify-content:space-between;">
@@ -775,43 +775,43 @@
             function getNextFloorNo() { if(POSTS.length===0)return 0; return Math.max(...POSTS.map(p=>p.no||0))+1; }
             function getSearchSnippet(content, query, maxLen) {
                 maxLen = maxLen || 22;
-                var div = document.createElement('div');
+                let div = document.createElement('div');
                 div.innerHTML = content;
-                var text = div.textContent || '';
-                var compactAll = text.replace(/\s+/g, ' ');
+                let text = div.textContent || '';
+                let compactAll = text.replace(/\s+/g, ' ');
                 if (!compactAll.trim()) return '';
 
                 if (!query) {
-                    var s = compactAll.trim();
+                    let s = compactAll.trim();
                     return s.length > maxLen ? s.slice(0, maxLen) + '…' : s;
                 }
 
-                var ql = query.toLowerCase();
-                var lines = text.split('\n');
-                var foundLine = '', foundPos = -1;
+                let ql = query.toLowerCase();
+                let lines = text.split('\n');
+                let foundLine = '', foundPos = -1;
 
-                for (var i = 0; i < lines.length; i++) {
-                    var li = lines[i].trim();
+                for (let i = 0; i < lines.length; i++) {
+                    let li = lines[i].trim();
                     if (!li) continue;
-                    var pos = li.toLowerCase().indexOf(ql);
+                    let pos = li.toLowerCase().indexOf(ql);
                     if (pos !== -1) { foundLine = li; foundPos = pos; break; }
                 }
 
                 if (foundPos === -1) {
-                    var idx = compactAll.toLowerCase().indexOf(ql);
+                    let idx = compactAll.toLowerCase().indexOf(ql);
                     if (idx === -1) {
-                        var ss = compactAll.trim();
+                        let ss = compactAll.trim();
                         return ss.length > maxLen ? ss.slice(0, maxLen) + '…' : ss;
                     }
                     foundLine = compactAll;
                     foundPos = idx;
                 }
 
-                var half = Math.floor((maxLen - query.length) / 2);
-                var start = Math.max(0, foundPos - half);
-                var end = Math.min(foundLine.length, start + maxLen);
+                let half = Math.floor((maxLen - query.length) / 2);
+                let start = Math.max(0, foundPos - half);
+                let end = Math.min(foundLine.length, start + maxLen);
                 if (end - start < maxLen) start = Math.max(0, end - maxLen);
-                var snippet = foundLine.slice(start, end).trim();
+                let snippet = foundLine.slice(start, end).trim();
                 if (start > 0) snippet = '…' + snippet;
                 if (end < foundLine.length) snippet = snippet + '…';
                 return snippet;
@@ -860,7 +860,7 @@
 
             function buildQuoteBlock(quote,refPost,refNo) {
                 const c=document.createElement('div'); c.className='quote-container';
-                c.innerHTML=`<div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refNo} ☆☆☆ ${escapeHtml(refPost.username||'==')}|${escapeHtml(refPost.userId||'????')} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
+                c.innerHTML=`<div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refNo} ☆☆☆ ${escapeHtml(refPost.username||'==')}|${escapeHtml(refPost.userId||'????')} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
                 return c;
             }
 
@@ -903,7 +903,7 @@
                     const d=document.createElement('div'); d.className='post-item';
                     const char = findCharById(p.userId);
                     const avatarSrc = getAvatarSrc(char);
-                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span><span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span></div><div class="time-row">Nº${p.no} ${escapeHtml(p.time)}</div></div><span class="more-btn">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${arrIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${arrIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${arrIdx}">✕ 删除</button></div>`;
+                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span><span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span></div><div class="time-row">Nº${p.no} ${escapeHtml(p.time)}</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${arrIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${arrIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${arrIdx}">✕ 删除</button></div>`;
                     const contentDiv=d.querySelector('.post-content');
                     if(p.quote && p.quote.refNo>=0){
                         const refPost = findPostByNo(p.quote.refNo);
@@ -928,9 +928,34 @@
 
             function renderAll() { renderHeader(); renderPostsPage(currentPage); updateCharSearchList(); updateCharListInModal(); }
 
-            function openModal(id) { document.getElementById(id).classList.add('active'); document.body.style.overflow='hidden'; }
-            function closeModal(id) { document.getElementById(id).classList.remove('active'); document.body.style.overflow=''; }
-            function closeAllModals() { document.querySelectorAll('.modal-overlay').forEach(o=>o.classList.remove('active')); document.body.style.overflow=''; }
+            let lastFocusedEl = null, bodyScrollY = 0;
+            function openModal(id) {
+                lastFocusedEl = document.activeElement;
+                bodyScrollY = window.scrollY;
+                const modal = document.getElementById(id);
+                modal.classList.add('active');
+                document.body.style.position = 'fixed';
+                document.body.style.top = -bodyScrollY + 'px';
+                document.body.style.width = '100%';
+                const focusTarget = modal.querySelector('[autofocus]') || modal.querySelector('button, input, [tabindex]');
+                if (focusTarget) setTimeout(() => focusTarget.focus(), 50);
+            }
+            function closeModal(id) {
+                document.getElementById(id).classList.remove('active');
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, bodyScrollY);
+                if (lastFocusedEl) setTimeout(() => lastFocusedEl.focus(), 50);
+            }
+            function closeAllModals() {
+                document.querySelectorAll('.modal-overlay').forEach(o => o.classList.remove('active'));
+                document.body.style.position = '';
+                document.body.style.top = '';
+                document.body.style.width = '';
+                window.scrollTo(0, bodyScrollY);
+                if (lastFocusedEl) setTimeout(() => lastFocusedEl.focus(), 50);
+            }
 
             document.querySelectorAll('.modal-overlay').forEach(overlay => {
                 overlay.addEventListener('click', function(e) { if (e.target === overlay) { /* do nothing */ } });
@@ -1288,7 +1313,7 @@
                     if(!CHARACTERS.length) listDiv.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
                     return;
                 }
-                var searchParts = f.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+                let searchParts = f.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
                 const filtered=all.filter(item=>searchParts.some(part=>item.c.name.toLowerCase().indexOf(part)!==-1||item.c.id.indexOf(part)!==-1));
                 listDiv.innerHTML=filtered.map(item=>`<div class="search-select-option" data-idx="${item.idx}">${escapeHtml(item.c.name)} | ${escapeHtml(item.c.id)}${item.c.favorite?' ⭐':''}</div>`).join('');
                 if(!filtered.length) listDiv.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
@@ -1298,7 +1323,7 @@
                 const input = document.getElementById('charSearchInput').value.trim();
                 const btn = document.getElementById('btnCharConfirm');
                 if (!input) { btn.classList.add('disabled'); btn.disabled = true; return; }
-                var parts = input.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
+                let parts = input.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
                 const matched = CHARACTERS.some(function(c){
                     return parts.some(function(p){ return c.name === p || c.id === p; });
                 });
@@ -1472,9 +1497,9 @@
                     setTimeout(function () {
                         list.classList.remove('open');
                         if (hidden.value !== '-1' && !search.value.trim()) {
-                            var idx = parseInt(hidden.value);
-                            var p = POSTS[idx];
-                            var preview = getSearchSnippet(p.content, '', 15);
+                            let idx = parseInt(hidden.value);
+                            let p = POSTS[idx];
+                            let preview = getSearchSnippet(p.content, '', 15);
                             search.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
                             search.dataset.hasSelection = 'true';
                             clearBtn.style.display = 'block';
@@ -1484,12 +1509,12 @@
                 search.addEventListener('input', function () { renderList(search.value); });
 
                 list.addEventListener('click', function (e) {
-                    var opt = e.target.closest('.search-select-option');
+                    let opt = e.target.closest('.search-select-option');
                     if (!opt || opt.getAttribute('data-idx') === null) return;
-                    var idx = parseInt(opt.getAttribute('data-idx'));
+                    let idx = parseInt(opt.getAttribute('data-idx'));
                     hidden.value = idx;
-                    var p = POSTS[idx];
-                    var preview = getSearchSnippet(p.content, '', 15);
+                    let p = POSTS[idx];
+                    let preview = getSearchSnippet(p.content, '', 15);
                     search.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
                     search.dataset.hasSelection = 'true';
                     clearBtn.style.display = 'block';
@@ -1555,9 +1580,9 @@
                     time.value=nowTimeStr(); content.value='';
                 }
                 if (qHidden.value !== '-1' && parseInt(qHidden.value) >= 0 && parseInt(qHidden.value) < POSTS.length) {
-                    var qIdx = parseInt(qHidden.value);
-                    var p = POSTS[qIdx];
-                    var preview = getSearchSnippet(p.content, '', 15);
+                    let qIdx = parseInt(qHidden.value);
+                    let p = POSTS[qIdx];
+                    let preview = getSearchSnippet(p.content, '', 15);
                     refSearch.value = 'Nº' + p.no + ' — ' + (p.username || '==') + ': ' + preview;
                     refSearch.dataset.hasSelection = 'true';
                     refClearBtn.style.display = 'block';
@@ -1745,10 +1770,10 @@ ${themeCSS}
                 }
                 prevNo=post.no;
 
-                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span><span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span></div><div class="time-row">Nº'+String(post.no)+' '+escapeHtml(post.time)+'</div></div><span class="more-btn">...</span></div><div class="post-content">';
+                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span><span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span></div><div class="time-row">Nº'+String(post.no)+' '+escapeHtml(post.time)+'</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content">';
                 if(post.quote&&post.quote.refNo>=0){
                     var r=findPostByNo(post.quote.refNo);
-                    if(r) html+='<div class="quote-container"><div class="quote-header"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">Nº'+String(post.quote.refNo)+' ☆☆☆ '+escapeHtml(r.username||'==')+'|'+escapeHtml(r.userId||'?')+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>';
+                    if(r) html+='<div class="quote-container"><div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">Nº'+String(post.quote.refNo)+' ☆☆☆ '+escapeHtml(r.username||'==')+'|'+escapeHtml(r.userId||'?')+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>';
                 }
                 html+='<div>'+post.content+'</div></div></div>';
                 list.innerHTML+=html;
@@ -1819,7 +1844,7 @@ ${themeCSS}
 
             $postList.addEventListener('click',e=>{
                 const h=e.target.closest('.quote-header'); const col=e.target.closest('.collapse-btn');
-                if(h||col){ const c=(h||col).closest('.quote-container'); if(!c) return; const cnt=c.querySelector('.quote-content'); const hl=c.querySelector('.history-label'); const tt=c.querySelector('.toggle-text'); const bm=c.querySelector('.quote-bottom-msg'); if(cnt.classList.contains('is-hidden')){ cnt.classList.remove('is-hidden'); if(hl)hl.style.display='none'; if(tt)tt.style.display='none'; if(bm)bm.style.display='none'; }else{ cnt.classList.add('is-hidden'); if(hl)hl.style.display='inline'; if(tt){tt.style.display='inline';tt.textContent='展开全部 ▼';} if(bm)bm.style.display='block'; } }
+                if(h||col){ const c=(h||col).closest('.quote-container'); if(!c) return; const cnt=c.querySelector('.quote-content'); const hl=c.querySelector('.history-label'); const tt=c.querySelector('.toggle-text'); const bm=c.querySelector('.quote-bottom-msg'); const qh=c.querySelector('.quote-header'); const cb=c.querySelector('.collapse-btn'); if(cnt.classList.contains('is-hidden')){ cnt.classList.remove('is-hidden'); if(hl)hl.style.display='none'; if(tt)tt.style.display='none'; if(bm)bm.style.display='none'; if(qh)qh.setAttribute('aria-expanded','true'); if(cb)cb.setAttribute('aria-expanded','true'); }else{ cnt.classList.add('is-hidden'); if(hl)hl.style.display='inline'; if(tt){tt.style.display='inline';tt.textContent='展开全部 ▼';} if(bm)bm.style.display='block'; if(qh)qh.setAttribute('aria-expanded','false'); if(cb)cb.setAttribute('aria-expanded','false'); } }
                 const act=e.target.closest('.post-action-btn'); if(!act) return;
                 const idx=parseInt(act.getAttribute('data-index')); if(isNaN(idx)) return;
                 if(act.getAttribute('data-action')==='edit'){ populatePostForm(idx); openModal('modalPostOverlay'); }
