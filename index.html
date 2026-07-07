@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>粉红论坛体 - 最终版</title>
+    <title>粉红论坛体生成器</title>
     <link rel="stylesheet" href="theme.css">
 </head>
 <body>
@@ -52,11 +52,11 @@
             <h3 id="modalCharsTitle">👤 角色库管理</h3>
             <div id="charListContainer"></div>
             <div class="form-group" style="margin-top:10px;">
-                <label for="charSearch" style="display:none;">搜索角色</label><input type="text" id="charSearch" placeholder="搜索角色（昵称或ID）">
+                <input type="text" id="charSearch" placeholder="搜索角色或ID">
             </div>
             <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
                 <div class="form-row">
-                    <div class="form-group form-half"><label>新角色</label><input type="text" id="newCharName" placeholder='留空默认"=="'></div>
+                    <div class="form-group form-half"><label>新角色</label><input type="text" id="newCharName" placeholder='留空默认"=="' maxlength="20"></div>
                     <div class="form-group form-half"><label>ID</label><input type="text" id="newCharId" placeholder="自动生成"></div>
                 </div>
                 <div class="form-actions" style="margin-top:12px;"><button class="btn-primary" id="btnAddChar">添加角色</button><button class="btn-secondary" data-close="modalCharsOverlay">关闭</button></div>
@@ -69,7 +69,7 @@
         <div class="modal" id="modalConfig" role="dialog" aria-modal="true" aria-labelledby="modalConfigTitle">
             <h3 id="modalConfigTitle">⚙ 编辑板块配置</h3>
             <div class="form-group"><label>板块名称</label><input type="text" id="cfgBoardName"></div>
-            <div class="form-group"><label>板块ID</label><input type="text" id="cfgBoardId"></div>
+            <div class="form-group"><label>板块ID</label><div style="display:flex;align-items:center;"><span style="padding:0 4px;font-weight:500;">ID:</span><input type="text" id="cfgBoardId" inputmode="numeric" pattern="[0-9]*" style="flex:1;"></div></div>
             <div class="form-group"><label>帖子标题</label><input type="text" id="cfgThreadTitle"></div>
             <!-- 主题选择器 -->
             <div class="theme-section">
@@ -101,12 +101,9 @@
             <!-- 角色搜索区，新增确认按钮 -->
             <div class="form-group" id="groupPresetChar">
                 <label>选择 / 新建角色</label>
-                <div style="display:flex; gap:6px;">
-                    <div class="search-select-wrap" style="flex:1;">
-                        <input type="text" class="search-select-input" id="charSearchInput" placeholder="搜索昵称或ID，输入新昵称可创建" autocomplete="off">
-                        <div class="search-select-list" id="charSearchList"></div>
-                    </div>
-                    <button class="alias-confirm-btn disabled" id="btnCharConfirm" disabled>确认</button>
+                <div class="search-select-wrap">
+                    <input type="text" class="search-select-input" id="charSearchInput" placeholder="输入或搜索角色名（或ID）" autocomplete="off" maxlength="20">
+                    <div class="search-select-list" id="charSearchList"></div>
                 </div>
             </div>
 
@@ -119,12 +116,9 @@
             <!-- 别名区，始终显示 -->
             <div class="form-group" id="groupAliasSelect">
                 <label>选择/新建别名</label>
-                <div style="display:flex; gap:6px;">
-                    <div class="search-select-wrap" style="flex:1;">
-                        <input type="text" class="search-select-input" id="aliasSearchInput" placeholder="输入别名，新别名需确认" autocomplete="off">
-                        <div class="search-select-list" id="aliasSearchList"></div>
-                    </div>
-                    <button class="alias-confirm-btn disabled" id="btnAliasConfirm" disabled>确认</button>
+                <div class="search-select-wrap">
+                    <input type="text" class="search-select-input" id="aliasSearchInput" placeholder="搜索或输入新别名" autocomplete="off" maxlength="20">
+                    <div class="search-select-list" id="aliasSearchList"></div>
                 </div>
             </div>
 
@@ -139,7 +133,7 @@
             <div class="form-row">
                 <div class="form-group form-half">
                     <label>楼层号 <span class="hint" id="floorNoHint">可跳过</span></label>
-                    <input type="number" id="postFloorNo" min="0" placeholder="自动">
+                    <input type="text" id="postFloorNo" inputmode="numeric" placeholder="自动">
                 </div>
                 <div class="form-group form-half">
                     <label>发布时间</label>
@@ -844,7 +838,7 @@
                 if(changed) saveToStorage();
             }
 
-            function renderHeader() { $boardTitle.textContent=CONFIG.boardName; $boardId.textContent=CONFIG.boardId; $threadTitle.textContent=CONFIG.threadTitle; }
+            function renderHeader() { $boardTitle.textContent=CONFIG.boardName; $boardId.textContent='ID:'+CONFIG.boardId; $threadTitle.textContent=CONFIG.threadTitle; }
 
             function getAvatarSrc(char) {
                 if (char && char.avatar && (char.avatar.startsWith('data:') || char.avatar.startsWith('http'))) return char.avatar;
@@ -1145,7 +1139,7 @@
                     const wrap=document.createElement('span');
                     wrap.style.cssText='display:inline-flex;align-items:center;max-width:130px;';
                     const input=document.createElement('input');
-                    input.type='text'; input.value=ch.name;
+                    input.type='text'; input.value=ch.name; input.maxLength=20;
                     input.style.cssText='font-size:inherit;font-weight:bold;width:100%;min-width:60px;height:24px;padding:0 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;line-height:24px;';
                     const btn=document.createElement('button');
                     btn.textContent='✓'; btn.style.cssText='font-size:inherit;height:24px;padding:0 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;line-height:24px;flex-shrink:0;';
@@ -1169,14 +1163,14 @@
                     const wrapper=document.createElement('span');
                     wrapper.style.cssText='display:inline-flex;align-items:center;';
                     const inp=document.createElement('input');
-                    inp.type='text'; inp.value=aliases.join(', ');
+                    inp.type='text'; inp.value=aliases.join(', '); inp.maxLength=200;
                     inp.style.cssText='font-size:11px;width:120px;padding:1px 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;';
                     const btn=document.createElement('button');
                     btn.textContent='✓'; btn.style.cssText='font-size:11px;padding:1px 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;';
                     wrapper.appendChild(inp); wrapper.appendChild(btn);
                     aliasEl.replaceWith(wrapper); inp.focus(); inp.select();
                     const save=()=>{
-                        const raw=inp.value.split(',').map(s=>s.trim()).filter(Boolean);
+                        const raw=inp.value.split(',').map(s=>s.trim()).filter(s=>s&&s.length<=20);
                         ch.aliases=[...new Set(raw)];
                         saveToStorage(); renderAll(); updateCharListInModal();
                     };
@@ -1210,7 +1204,7 @@
             // 配置编辑
             document.getElementById('btnSaveConfig').addEventListener('click',()=>{
                 CONFIG.boardName=document.getElementById('cfgBoardName').value.trim()||CONFIG.boardName;
-                CONFIG.boardId=document.getElementById('cfgBoardId').value.trim()||CONFIG.boardId;
+                CONFIG.boardId=document.getElementById('cfgBoardId').value.replace(/\D/g,'')||CONFIG.boardId;
                 CONFIG.threadTitle=document.getElementById('cfgThreadTitle').value.trim()||CONFIG.threadTitle;
                 setTheme(pendingThemeId, pendingHue);
                 saveToStorage(); closeModal('modalConfigOverlay');
@@ -1218,7 +1212,7 @@
             });
             function populateConfigModal() {
                 document.getElementById('cfgBoardName').value=CONFIG.boardName;
-                document.getElementById('cfgBoardId').value=CONFIG.boardId;
+                document.getElementById('cfgBoardId').value=CONFIG.boardId.replace(/^ID:/,'');
                 document.getElementById('cfgThreadTitle').value=CONFIG.threadTitle;
                 pendingThemeId = currentThemeId;
                 pendingHue = currentHue;
@@ -1319,29 +1313,11 @@
                 if(!filtered.length) listDiv.innerHTML='<div class="search-select-option" style="color:#999;">无匹配</div>';
             }
 
-            function updateCharConfirmButton() {
-                const input = document.getElementById('charSearchInput').value.trim();
-                const btn = document.getElementById('btnCharConfirm');
-                if (!input) { btn.classList.add('disabled'); btn.disabled = true; return; }
-                let parts = input.split('|').map(function(p){ return p.trim(); }).filter(Boolean);
-                const matched = CHARACTERS.some(function(c){
-                    return parts.some(function(p){ return c.name === p || c.id === p; });
-                });
-                if (matched) {
-                    btn.classList.add('disabled');
-                    btn.disabled = true;
-                } else {
-                    btn.classList.remove('disabled');
-                    btn.disabled = false;
-                }
-            }
-
             // 角色搜索框交互
             document.getElementById('charSearchInput').addEventListener('focus',function(){ document.getElementById('charSearchList').classList.add('open'); updateCharSearchList(this.value); });
             document.getElementById('charSearchInput').addEventListener('blur',function(){ setTimeout(()=>document.getElementById('charSearchList').classList.remove('open'),150); });
             document.getElementById('charSearchInput').addEventListener('input',function(){
                 updateCharSearchList(this.value);
-                updateCharConfirmButton();
             });
 
             // 角色搜索列表点击：选中已有角色
@@ -1352,37 +1328,9 @@
                 const ch = CHARACTERS[idx];
                 document.getElementById('charSearchInput').value = `${ch.name} | ${ch.id}`;
                 document.getElementById('charSearchList').classList.remove('open');
-                document.getElementById('aliasSearchInput').value = '';
-                selectedAlias = '';
+                document.getElementById('aliasSearchInput').value = ch.lastAlias || '';
+                selectedAlias = ch.lastAlias || '';
                 updateAliasSearchList('');
-                updateAliasConfirmButton();
-                updateCharConfirmButton();
-            });
-
-            // 确认角色按钮：新建角色（立即创建）
-            document.getElementById('btnCharConfirm').addEventListener('click', function() {
-                if (this.disabled) return;
-                const name = document.getElementById('charSearchInput').value.trim();
-                if (!name) return;
-                const customId = document.getElementById('postCustomId').value.trim();
-                const newId = customId || generateRandomId();
-                if (CHARACTERS.some(c => c.id === newId)) {
-                    showToast('ID重复，请重新输入', 'warning');
-                    return;
-                }
-                const newChar = { id: newId, name: name, aliases: [], avatar: '', favorite: false };
-                CHARACTERS.push(newChar);
-                selectedCharIndex = CHARACTERS.indexOf(newChar);
-                selectedAlias = name;
-                document.getElementById('aliasSearchInput').value = name;
-                document.getElementById('charSearchInput').value = `${name} | ${newId}`;
-                document.getElementById('postCustomId').value = '';
-                updateCharConfirmButton();
-                updateAliasConfirmButton();
-                updateAliasSearchList('');
-                updateCharListInModal();
-                saveToStorage();
-                showToast('角色已创建', 'success');
             });
 
             // 别名区域逻辑
@@ -1409,7 +1357,6 @@
             document.getElementById('aliasSearchInput').addEventListener('blur',function(){ setTimeout(()=>document.getElementById('aliasSearchList').classList.remove('open'),150); });
             document.getElementById('aliasSearchInput').addEventListener('input',function(){
                 if (selectedCharIndex >= 0) updateAliasSearchList(this.value);
-                updateAliasConfirmButton();
             });
             document.getElementById('aliasSearchList').addEventListener('click',function(e){
                 const opt=e.target.closest('.search-select-option'); if(!opt) return;
@@ -1417,32 +1364,6 @@
                 document.getElementById('aliasSearchInput').value = alias;
                 selectedAlias = alias;
                 document.getElementById('aliasSearchList').classList.remove('open');
-                updateAliasConfirmButton();
-            });
-
-            function updateAliasConfirmButton() {
-                const input = document.getElementById('aliasSearchInput').value.trim();
-                const btn = document.getElementById('btnAliasConfirm');
-                if (!input || selectedCharIndex < 0) { btn.classList.add('disabled'); btn.disabled = true; return; }
-                const ch = CHARACTERS[selectedCharIndex];
-                const aliases = ch.aliases || [];
-                if (aliases.includes(input)) { btn.classList.add('disabled'); btn.disabled = true; }
-                else { btn.classList.remove('disabled'); btn.disabled = false; }
-            }
-
-            document.getElementById('btnAliasConfirm').addEventListener('click',function(){
-                if (this.disabled) return;
-                const input = document.getElementById('aliasSearchInput').value.trim();
-                if(!input || selectedCharIndex<0) return;
-                const ch = CHARACTERS[selectedCharIndex];
-                if (!ch.aliases) ch.aliases = [];
-                if (!ch.aliases.includes(input)) {
-                    ch.aliases.push(input);
-                    ch.aliases = [input, ...ch.aliases.filter(a=>a!==input)];
-                    selectedAlias = input;
-                    showToast(`别名"${input}"已确认`,'success');
-                    updateAliasConfirmButton();
-                }
             });
 
             // 引用搜索（模糊匹配 + 关键词高亮 + 统一格式）
@@ -1541,8 +1462,6 @@
                 document.getElementById('charSearchInput').value = '';
                 document.getElementById('aliasSearchInput').value = '';
                 document.getElementById('postCustomId').value = '';
-                updateCharConfirmButton();
-                updateAliasConfirmButton();
 
                 document.getElementById('postEditIndex').value=postIdx;
                 const floorNoInput=document.getElementById('postFloorNo');
@@ -1591,8 +1510,6 @@
                     delete refSearch.dataset.hasSelection;
                     refClearBtn.style.display = 'none';
                 }
-                updateAliasConfirmButton();
-                updateCharConfirmButton();
             }
 
             document.getElementById('btnSavePost').addEventListener('click',()=>{
@@ -1624,22 +1541,28 @@
                     // 使用已有角色
                     const ch = CHARACTERS[selectedCharIndex];
                     userId = ch.id;
-                    username = selectedAlias || ch.name;
+                    const aliasInput = document.getElementById('aliasSearchInput').value.trim();
+                    username = aliasInput || ch.name;
+                    if (aliasInput && !ch.aliases.includes(aliasInput)) {
+                        ch.aliases = [aliasInput, ...ch.aliases];
+                    }
+                    ch.lastAlias = username;
                 } else {
                     // 新建角色
                     const nameInput = document.getElementById('charSearchInput').value.trim();
-                    username = nameInput || '==';
+                    const aliasInput = document.getElementById('aliasSearchInput').value.trim();
+                    username = aliasInput || nameInput || '==';
                     const customId = document.getElementById('postCustomId').value.trim();
                     userId = customId || generateRandomId();
                     if (CHARACTERS.some(c => c.id === userId)) {
                         showToast('ID重复，请重新输入', 'warning');
                         return;
                     }
-                    const newChar = { id: userId, name: username, aliases: [], avatar: '', favorite: false };
-                    const aliasInput = document.getElementById('aliasSearchInput').value.trim();
-                    if (aliasInput && aliasInput !== username && !newChar.aliases.includes(aliasInput)) {
+                    const newChar = { id: userId, name: nameInput || '==', aliases: [], avatar: '', favorite: false };
+                    if (aliasInput && aliasInput !== newChar.name && !newChar.aliases.includes(aliasInput)) {
                         newChar.aliases.push(aliasInput);
                     }
+                    newChar.lastAlias = username;
                     CHARACTERS.push(newChar);
                 }
 
