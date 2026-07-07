@@ -217,9 +217,6 @@
             align-items: baseline;
             flex-wrap: wrap;
         }
-        .username {
-            font-weight: 500;
-        }
         .user-id-separator {
             color: var(--userid-color);
             font-size: 13px;

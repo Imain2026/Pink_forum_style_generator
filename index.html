@@ -140,7 +140,7 @@
                     <input type="text" id="postTime" placeholder="2026-07-05 09:12:08">
                 </div>
             </div>
-            <div class="form-group"><label>内容 <span class="hint">回车自动换行，支持HTML标签</span><button class="btn-hidden-post" id="btnHiddenPost">此楼层不可见</button></label><textarea id="postContent" placeholder="输入帖子内容..."></textarea></div>
+            <div class="form-group"><label>内容 <span class="hint">回车自动换行，支持HTML标签</span><button class="btn-hidden-post" id="btnHiddenPost">内容不可见楼层</button></label><textarea id="postContent" placeholder="输入帖子内容..."></textarea></div>
             <div class="form-actions"><button class="btn-primary" id="btnSavePost">保存</button><button class="btn-secondary" data-close="modalPostOverlay">关闭</button></div>
         </div>
     </div>
@@ -1352,6 +1352,10 @@
 
             document.getElementById('aliasSearchInput').addEventListener('focus',function(){
                 if(selectedCharIndex >= 0) {
+                    this.value = '';
+                    selectedAlias = '';
+                }
+                if(selectedCharIndex >= 0) {
                     document.getElementById('aliasSearchList').classList.add('open');
                     updateAliasSearchList(this.value);
                 } else {
@@ -1485,8 +1489,13 @@
                         const ch = findCharById(p.userId);
                         selectedCharIndex = CHARACTERS.indexOf(ch);
                         document.getElementById('charSearchInput').value = `${ch.name} | ${ch.id}`;
-                        document.getElementById('aliasSearchInput').value = p.username || ch.name;
-                        selectedAlias = p.username || ch.name;
+                        if (p.username && p.username !== ch.name) {
+                            document.getElementById('aliasSearchInput').value = p.username;
+                            selectedAlias = p.username;
+                        } else {
+                            document.getElementById('aliasSearchInput').value = '';
+                            selectedAlias = '';
+                        }
                     } else {
                         document.getElementById('charSearchInput').value = p.username || '';
                     }
@@ -1543,7 +1552,12 @@
 
                 let userId, username = '==';
 
-                if (selectedCharIndex >= 0) {
+                if (postIdx >= 0 && selectedCharIndex < 0 && !document.getElementById('charSearchInput').value.trim()) {
+                    // 编辑模式且未指定新角色：保留原帖身份
+                    const origPost = POSTS[postIdx];
+                    userId = origPost.userId;
+                    username = origPost.username;
+                } else if (selectedCharIndex >= 0) {
                     // 使用已有角色
                     const ch = CHARACTERS[selectedCharIndex];
                     userId = ch.id;
