@@ -183,19 +183,28 @@
     <script>
         (function() {
             const DEFAULT_CONFIG = {
-                boardName: '示例板块', boardId: 'ID:9970811',
-                threadTitle: '【示例】There is a example.',
+                boardName: '示例板块', boardId: '9970811',
+                threadTitle: '【示例】一个示例帖子',
             };
             const DEFAULT_CHARACTERS = [
                 { id: '7410ea09', name: '==', aliases: [], avatar: '', favorite: false },
-                { id: 'lb0608178', name: 'Ku', aliases: [], avatar: '', favorite: false },
-                { id: '8521fb10', name: 'Sa', aliases: [], avatar: '', favorite: false },
+                { id: '4ada0387', name: 'A角色', aliases: ['C角色'], avatar: '', favorite: false, lastAlias: 'A角色' },
+                { id: '4807d80a', name: 'B角色', aliases: ['B角色'], avatar: '', favorite: false, lastAlias: 'B角色' },
+                { id: 'dd0edfe0', name: '==', aliases: [], avatar: '', favorite: false, lastAlias: '==' },
+                { id: '35de8faa', name: '==', aliases: [], avatar: '', favorite: false, lastAlias: '==' },
+                { id: 'f3dd1890', name: '==', aliases: [], avatar: '', favorite: false, lastAlias: '==' },
+                { id: 'f4050894', name: '==', aliases: ['=='], avatar: '', favorite: false, lastAlias: '==' },
+                { id: 'c34e989d', name: '==', aliases: [], avatar: '', favorite: false, lastAlias: '==' },
+                { id: 'db317a21', name: '==', aliases: [], avatar: '', favorite: false, lastAlias: '==' },
             ];
             const DEFAULT_POSTS = [
                 { no:0, userId: '7410ea09', username: '==', time: '2026-07-05 09:12:08', content: 'rbt，<span style="color:#c24949;font-weight:500">"主楼示例"</span>' },
-                { no:1, userId: '7410ea09', username: '==', time: '2026-07-05 09:14:35', content: 'LZ的回复示例', quote: { refNo: 0, refContent: 'rbt，<span style="color:#c24949;font-weight:500">"主楼示例"</span>' } },
-                { no:2, userId: 'lb0608178', username: 'Ku', time: '2026-07-05 09:28:41', content: 'A角色的跟帖示例' },
-                { no:3, userId: '8521fb10', username: 'Sa', time: '2026-07-05 09:33:17', content: 'B角色的跟贴回复示例', quote: { refNo: 2, refContent: 'A角色的跟帖示例' } }
+                { no:1, userId: '4ada0387', username: 'A角色', time: '2026-07-07 20:24:55', content: '跟帖示例' },
+                { no:2, userId: '4807d80a', username: 'B角色', time: '2026-07-07 20:25:04', content: '回复示例', quote: { refNo: 1, refContent: '跟帖示例' } },
+                { no:7, userId: 'f4050894', username: '==', time: '2026-07-07 20:26:34', content: '隐藏楼层示例' },
+                { no:8, userId: '4ada0387', username: 'C角色', time: '2026-07-07 20:30:26', content: '别名示例' },
+                { no:9, userId: '4807d80a', username: 'B角色', time: '2026-07-07 20:33:21', content: '<div style="color:#cc3333;font-size:15px;padding:12px 0;">*此楼层不可见*</div>' },
+                { no:10, userId: '4ada0387', username: 'A角色', time: '2026-07-07 20:33:29', content: '引用不可见楼层回复示例', quote: { refNo: 9, refContent: '<div style="color:#cc3333;font-size:15px;padding:12px 0;">*此楼层不可见*</div>' } },
             ];
 
             const POSTS_PER_PAGE = 20;
@@ -1815,7 +1824,7 @@ ${themeCSS}
 
             function init(){
                 loadThemePreference();
-                if(!loadFromStorage()){ CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); }
+                if(!loadFromStorage()){ CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); if(!currentThemeId) setTheme('classic', -2); }
                 autoFixPosts(); setupRefSearch(); renderAll();
             }
             init();
