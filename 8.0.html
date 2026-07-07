@@ -173,7 +173,7 @@
             display: block;
             width: 24px;
             height: 0;
-            border-top: 1px solid var(--bar-color);
+            border-top: 1px solid var(--text-secondary);
             margin: 4px 0;
         }
 
@@ -981,6 +981,7 @@
             filter: brightness(0.85) saturate(1.3);
             border-radius: 0 0 50% 50%;
         }
+        .preset-swatch.split-swatch::after { display: none; }
         .preset-name {
             font-size: 11px;
             color: #666;
@@ -1002,6 +1003,7 @@
         .custom-hue-row input[type="range"] {
             flex: 1;
             -webkit-appearance: none;
+            appearance: none;
             height: 8px;
             border-radius: 4px;
             background: linear-gradient(to right,
@@ -1028,6 +1030,10 @@
             color: #555;
             min-width: 36px;
             text-align: right;
+        }
+        .hue-value.inactive {
+            color: #aaa;
+            font-weight: 400;
         }
     </style>
 </head>
@@ -1246,7 +1252,8 @@
             ];
             const THEME_PRESETS_NIGHT = [
                 { id: 'mono',    name: '🕶️ 匿名', hue: -3, desc: '黑白灰暗色' },
-                { id: 'rose',    name: '🥀 烟熏玫瑰', hue: -4, desc: '暗玫瑰色系' },
+                { id: 'catppuccin', name: '🍨 猫爪咖啡', hue: -8, desc: '暗紫褐 · 柔和粉彩' },
+                { id: 'everforest', name: '🌲 常青森林', hue: -9, desc: '暗绿底 · 暖奶油字' },
                 { id: 'plum',    name: '🍇 丝绒暗紫', hue: -5, desc: '暗紫色系' },
                 { id: 'blood',   name: '🩸 血腥诅咒', hue: -6, desc: '暗血色系' },
             ];
@@ -1276,6 +1283,7 @@
                     '--quote-meta':          '#666',
                     '--username-color':      '#303030',
                     '--avatar-bg':           c(0, 38, 88),
+                    '--avatar-fg':           '#ffffff',
                     '--toolbar-bg':          c(0, 14, 97),
                     '--toolbar-border':      c(0, 20, 90),
                     '--btn-bg':              c(0, 30, 92),
@@ -1332,7 +1340,8 @@
                     '--quote-text':          '#c0c0c0',
                     '--quote-meta':          '#999',
                     '--username-color':      '#d0d0d0',
-                    '--avatar-bg':           c(0, 22, 28),
+                    '--avatar-bg':           '#c8c8d8',
+                    '--avatar-fg':           c(0, 35, 48),
                     '--toolbar-bg':          '#1e1e35',
                     '--toolbar-border':      c(0, 15, 28),
                     '--btn-bg':              c(0, 20, 26),
@@ -1387,7 +1396,8 @@
                     '--quote-text':          '#c0c0c0',
                     '--quote-meta':          '#999',
                     '--username-color':      '#d8d8d8',
-                    '--avatar-bg':           '#2e2e2e',
+                    '--avatar-bg':           '#d0d0d0',
+                    '--avatar-fg':           '#666',
                     '--toolbar-bg':          '#181818',
                     '--toolbar-border':      '#333',
                     '--btn-bg':              '#2a2a2a',
@@ -1431,63 +1441,121 @@
                 };
             }
 
-            function generateRoseDarkThemeVars() {
+            function generateCatppuccinThemeVars() {
+                /* Catppuccin Mocha — catppuccin.com/palette */
                 return {
-                    '--page-bg':             '#120b0e',
-                    '--primary-bg':          '#1f1418',
-                    '--header-bg':           '#1a0f13',
-                    '--header-border':       '#3a1f2a',
-                    '--quote-bg':            '#2a141e',
-                    '--quote-text':          '#d4bcc6',
-                    '--quote-meta':          '#b0909c',
-                    '--username-color':      '#e8c8d4',
-                    '--avatar-bg':           '#3a1f2a',
-                    '--toolbar-bg':          '#1a0f13',
-                    '--toolbar-border':      '#3a1f2a',
-                    '--btn-bg':              '#2a1822',
-                    '--btn-hover':           '#3a2230',
-                    '--btn-text':            '#d4b0be',
-                    '--input-border':        '#3a2530',
-                    '--input-focus':         '#a33b6a',
-                    '--post-title-color':    '#d4a0b4',
-                    '--post-title-hover-bg': '#24161c',
-                    '--modal-title-color':   '#d4a0b4',
-                    '--modal-title-border':  '#3a1f2a',
-                    '--btn-primary-bg':      '#a33b6a',
-                    '--btn-primary-hover':   '#b84478',
-                    '--btn-primary-text':    '#f6d2e2',
-                    '--pagination-border':   '#3a1f2a',
-                    '--pagination-hover-border': '#6a3050',
-                    '--pagination-hover-text':   '#e0b8c8',
-                    '--char-btn-border':     '#3a2530',
-                    '--char-btn-hover-bg':   '#2a1822',
-                    '--char-btn-hover-border': '#8a4060',
-                    '--floor-gap-dash':      '#3a1f2a',
-                    '--floor-gap-text':      '#8a6070',
-                    '--floor-gap-more':      '#9a7080',
-                    '--file-upload-bg':      '#1f1418',
-                    '--file-upload-border':  '#3a2530',
-                    '--file-upload-hover-bg':'#281a20',
-                    '--checkbox-accent':     '#a33b6a',
-                    '--input-focus-glow':    'rgba(163,59,106,0.18)',
-                    '--btn-toolbar-border':  '#3a2530',
-                    '--btn-toolbar-hover-border': '#8a4060',
-                    '--bar-color':           '#b0909c',
-                    '--text-primary':        '#e0ccd4',
-                    '--text-secondary':      '#b098a4',
-                    '--text-time':           '#987880',
-                    '--userid-color':        '#a08890',
-                    '--more-dots-color':     '#b8a0a8',
-                    '--border-color':        '#3a1f2a',
-                    '--post-separator':      '#3d2530',
-                    '--modal-bg':            '#1f1418',
+                    '--page-bg':             '#0e0e18',
+                    '--primary-bg':          '#313244',
+                    '--header-bg':           '#1e1e2e',
+                    '--header-border':       '#45475a',
+                    '--quote-bg':            '#252538',
+                    '--quote-text':          '#bac2de',
+                    '--quote-meta':          '#6c7086',
+                    '--username-color':      '#cdd6f4',
+                    '--avatar-bg':           '#d8d8e8',
+                    '--avatar-fg':           '#989bd8',
+                    '--toolbar-bg':          '#141620',
+                    '--toolbar-border':      '#45475a',
+                    '--btn-bg':              '#252538',
+                    '--btn-hover':           '#45475a',
+                    '--btn-text':            '#cdd6f4',
+                    '--input-border':        '#45475a',
+                    '--input-focus':         '#b4befe',
+                    '--post-title-color':    '#a6adc8',
+                    '--post-title-hover-bg': '#252538',
+                    '--modal-title-color':   '#a6adc8',
+                    '--modal-title-border':  '#45475a',
+                    '--btn-primary-bg':      '#b4befe',
+                    '--btn-primary-hover':   '#c4ceff',
+                    '--btn-primary-text':    '#0e0e18',
+                    '--pagination-border':   '#45475a',
+                    '--pagination-hover-border': '#b4befe',
+                    '--pagination-hover-text':   '#b4befe',
+                    '--char-btn-border':     '#45475a',
+                    '--char-btn-hover-bg':   '#252538',
+                    '--char-btn-hover-border': '#b4befe',
+                    '--floor-gap-dash':      '#45475a',
+                    '--floor-gap-text':      '#6c7086',
+                    '--floor-gap-more':      '#7f849c',
+                    '--file-upload-bg':      '#1e1e2e',
+                    '--file-upload-border':  '#45475a',
+                    '--file-upload-hover-bg':'#252538',
+                    '--checkbox-accent':     '#b4befe',
+                    '--input-focus-glow':    'rgba(180,190,254,0.20)',
+                    '--btn-toolbar-border':  '#45475a',
+                    '--btn-toolbar-hover-border': '#b4befe',
+                    '--bar-color':           '#a6adc8',
+                    '--text-primary':        '#cdd6f4',
+                    '--text-secondary':      '#a6adc8',
+                    '--text-time':           '#6c7086',
+                    '--userid-color':        '#6c7086',
+                    '--more-dots-color':     '#7f849c',
+                    '--border-color':        '#45475a',
+                    '--post-separator':      '#45475a',
+                    '--modal-bg':            '#1e1e2e',
+                    '--modal-overlay':       'rgba(0,0,0,0.75)',
+                };
+            }
+
+            function generateEverforestThemeVars() {
+                /* Everforest Dark — github.com/sainnhe/everforest */
+                return {
+                    '--page-bg':             '#1e282c',
+                    '--primary-bg':          '#3a4840',
+                    '--header-bg':           '#2d353b',
+                    '--header-border':       '#3d5245',
+                    '--quote-bg':            '#2a3832',
+                    '--quote-text':          '#d3c6aa',
+                    '--quote-meta':          '#7a9080',
+                    '--username-color':      '#d3c6aa',
+                    '--avatar-bg':           '#d8dcd0',
+                    '--avatar-fg':           '#6a9688',
+                    '--toolbar-bg':          '#182820',
+                    '--toolbar-border':      '#414b50',
+                    '--btn-bg':              '#2a3832',
+                    '--btn-hover':           '#3a4a42',
+                    '--btn-text':            '#d3c6aa',
+                    '--input-border':        '#414b50',
+                    '--input-focus':         '#7fbbb3',
+                    '--post-title-color':    '#83c092',
+                    '--post-title-hover-bg': '#2a3832',
+                    '--modal-title-color':   '#83c092',
+                    '--modal-title-border':  '#414b50',
+                    '--btn-primary-bg':      '#7fbbb3',
+                    '--btn-primary-hover':   '#8fccc4',
+                    '--btn-primary-text':    '#1e282c',
+                    '--pagination-border':   '#414b50',
+                    '--pagination-hover-border': '#7fbbb3',
+                    '--pagination-hover-text':   '#7fbbb3',
+                    '--char-btn-border':     '#414b50',
+                    '--char-btn-hover-bg':   '#2a3832',
+                    '--char-btn-hover-border': '#7fbbb3',
+                    '--floor-gap-dash':      '#7a9080',
+                    '--floor-gap-text':      '#7a9080',
+                    '--floor-gap-more':      '#8a9a8c',
+                    '--file-upload-bg':      '#2d353b',
+                    '--file-upload-border':  '#414b50',
+                    '--file-upload-hover-bg':'#2a3832',
+                    '--checkbox-accent':     '#7fbbb3',
+                    '--input-focus-glow':    'rgba(127,187,179,0.18)',
+                    '--btn-toolbar-border':  '#414b50',
+                    '--btn-toolbar-hover-border': '#7fbbb3',
+                    '--bar-color':           '#8a9a8c',
+                    '--text-primary':        '#d3c6aa',
+                    '--text-secondary':      '#859289',
+                    '--text-time':           '#859289',
+                    '--userid-color':        '#859289',
+                    '--more-dots-color':     '#9da9a0',
+                    '--border-color':        '#3d5245',
+                    '--post-separator':      '#6f8d72',
+                    '--modal-bg':            '#2d353b',
                     '--modal-overlay':       'rgba(0,0,0,0.72)',
                 };
             }
 
             function generatePlumDarkThemeVars() {
                 return {
-                    '--page-bg':             '#0e0b12',
+                    '--page-bg':             '#14101a',
                     '--primary-bg':          '#1a1422',
                     '--header-bg':           '#120f18',
                     '--header-border':       '#2e1f3a',
@@ -1495,7 +1563,8 @@
                     '--quote-text':          '#d0c0e0',
                     '--quote-meta':          '#a890b8',
                     '--username-color':      '#e0d0f0',
-                    '--avatar-bg':           '#2e1f3a',
+                    '--avatar-bg':           '#d8d0e0',
+                    '--avatar-fg':           '#7a5088',
                     '--toolbar-bg':          '#120f18',
                     '--toolbar-border':      '#2e1f3a',
                     '--btn-bg':              '#261a30',
@@ -1550,7 +1619,8 @@
                     '--quote-text':          '#ffcccc',
                     '--quote-meta':          '#ff6666',
                     '--username-color':      '#ff8888',
-                    '--avatar-bg':           '#550808',
+                    '--avatar-bg':           '#e0d0d0',
+                    '--avatar-fg':           '#cc4444',
                     '--toolbar-bg':          '#0a0000',
                     '--toolbar-border':      '#dd0000',
                     /* 鲜红 */
@@ -1582,10 +1652,10 @@
                     '--input-focus-glow':    'rgba(255,0,0,0.35)',
                     '--btn-toolbar-border':  '#550808',
                     '--btn-toolbar-hover-border': '#ff0000',
-                    '--bar-color':           '#ee4444',
+                    '--bar-color':           '#ffaaaa',
                     /* 文字 */
                     '--text-primary':        '#eed8d8',
-                    '--text-secondary':      '#dd6666',
+                    '--text-secondary':      '#eed8d8',
                     '--text-time':           '#dd4444',
                     '--userid-color':        '#dd5555',
                     '--more-dots-color':     '#ee7777',
@@ -1609,7 +1679,8 @@
                     ...Object.keys(generateThemeVars(340)),
                     ...Object.keys(generateDarkThemeVars(340)),
                     ...Object.keys(generateMonoDarkThemeVars()),
-                    ...Object.keys(generateRoseDarkThemeVars()),
+                    ...Object.keys(generateCatppuccinThemeVars()),
+                    ...Object.keys(generateEverforestThemeVars()),
                     ...Object.keys(generatePlumDarkThemeVars()),
                     ...Object.keys(generateBloodDarkThemeVars())
                 ];
@@ -1627,8 +1698,10 @@
                         vars = generateDarkThemeVars(hue >= 0 ? hue : 340);
                     } else if (themeId === 'mono') {
                         vars = generateMonoDarkThemeVars();
-                    } else if (themeId === 'rose') {
-                        vars = generateRoseDarkThemeVars();
+                    } else if (themeId === 'catppuccin') {
+                        vars = generateCatppuccinThemeVars();
+                    } else if (themeId === 'everforest') {
+                        vars = generateEverforestThemeVars();
                     } else if (themeId === 'plum') {
                         vars = generatePlumDarkThemeVars();
                     } else if (themeId === 'blood') {
@@ -1677,8 +1750,15 @@
                 const slider = document.getElementById('hueSlider');
                 const valSpan = document.getElementById('hueValue');
                 if (slider && valSpan) {
-                    slider.value = pendingHue >= 0 ? pendingHue : 340;
-                    valSpan.textContent = (pendingHue >= 0 ? pendingHue : 340) + '°';
+                    if (pendingHue < 0) {
+                        slider.value = 340;
+                        valSpan.textContent = '未选择';
+                        valSpan.classList.add('inactive');
+                    } else {
+                        slider.value = pendingHue;
+                        valSpan.textContent = pendingHue + '°';
+                        valSpan.classList.remove('inactive');
+                    }
                 }
             }
 
@@ -1688,7 +1768,7 @@
                 const style = getComputedStyle(root);
                 const vars = [
                     '--page-bg','--primary-bg','--header-bg','--header-border','--quote-bg',
-                    '--quote-text','--quote-meta','--username-color','--avatar-bg',
+                    '--quote-text','--quote-meta','--username-color','--avatar-bg','--avatar-fg',
                     '--toolbar-bg','--toolbar-border','--btn-bg','--btn-hover','--btn-text',
                     '--input-border','--input-focus','--post-title-color','--post-title-hover-bg',
                     '--modal-title-color','--modal-title-border','--btn-primary-bg','--btn-primary-hover',
@@ -1800,10 +1880,13 @@
             function getAvatarSrc(char) {
                 if (char && char.avatar && (char.avatar.startsWith('data:') || char.avatar.startsWith('http'))) return char.avatar;
                 const root = document.documentElement;
-                let hex = root.style.getPropertyValue('--avatar-bg').trim();
-                if (!hex) hex = '#fededf';
-                const bgColor = hex.replace('#', '%23');
-                return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${bgColor}'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23ffffff'/%3E%3C/svg%3E`;
+                let bg = root.style.getPropertyValue('--avatar-bg').trim();
+                if (!bg) bg = '#fededf';
+                let fg = root.style.getPropertyValue('--avatar-fg').trim();
+                if (!fg) fg = '#ffffff';
+                const bgColor = bg.replace('#', '%23');
+                const fgColor = fg.replace('#', '%23');
+                return `data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='${bgColor}'/%3E%3Ccircle cx='50' cy='40' r='20' fill='${fgColor}'/%3E%3Ccircle cx='50' cy='75' r='30' fill='${fgColor}'/%3E%3C/svg%3E`;
             }
 
             function buildQuoteBlock(quote,refPost,refNo) {
@@ -2114,30 +2197,43 @@
 
             function buildPresetTile(p) {
                 const isClassic = p.id === 'classic';
+                const isNight = p.id === 'mono' || p.id === 'catppuccin' || p.id === 'everforest' || p.id === 'plum' || p.id === 'blood';
                 const hue = p.hue >= 0 ? p.hue : 340;
-                let swatchBg, swatchInner;
+                let swatchBg, swatchInner, swatchRight;
                 if (isClassic) {
                     swatchBg = '#fedbef';
                     swatchInner = '#c24949';
                 } else if (p.id === 'mono') {
                     swatchBg = '#1e1e1e';
-                    swatchInner = '#aaa';
-                } else if (p.id === 'rose') {
-                    swatchBg = '#2a141e';
-                    swatchInner = '#a33b6a';
+                    swatchRight = '#999';
+                    swatchInner = '#ddd';
+                } else if (p.id === 'catppuccin') {
+                    swatchBg = '#313244';
+                    swatchRight = '#6c7086';
+                    swatchInner = '#cdd6f4';
+                } else if (p.id === 'everforest') {
+                    swatchBg = '#3a4840';
+                    swatchRight = '#7a9080';
+                    swatchInner = '#d3c6aa';
                 } else if (p.id === 'plum') {
-                    swatchBg = '#211428';
-                    swatchInner = '#6a2c6b';
+                    swatchBg = '#1a1422';
+                    swatchRight = '#a890b8';
+                    swatchInner = '#e0d4ec';
                 } else if (p.id === 'blood') {
-                    swatchBg = '#cc0000';
-                    swatchInner = '#ff3333';
+                    swatchBg = '#0a0101';
+                    swatchRight = '#cc0000';
+                    swatchInner = '#eed8d8';
                 } else {
-                    swatchBg = hslToHex(hue, 55, 88);
-                    swatchInner = hslToHex(hue, 58, 43);
+                    swatchBg = hslToHex(hue, 52, 91);
+                    swatchInner = hslToHex(hue, 40, 62);
                 }
                 const activeClass = p.id === pendingThemeId ? ' active' : '';
+                const swatchClass = 'preset-swatch split-swatch';
+                const swatchStyle = isNight
+                    ? 'background:' + swatchBg + ';box-shadow:inset 20px 0 0 0 ' + swatchRight + ';border-bottom:3px solid ' + swatchInner
+                    : 'background:' + swatchBg + ';border-bottom:3px solid ' + swatchInner;
                 return '<div class="preset-tile' + activeClass + '" data-theme-id="' + p.id + '" data-theme-hue="' + p.hue + '">' +
-                    '<div class="preset-swatch" style="background:' + swatchBg + ';border-bottom:3px solid ' + swatchInner + '"></div>' +
+                    '<div class="' + swatchClass + '" style="' + swatchStyle + '"></div>' +
                     '<span class="preset-name">' + p.name + '</span></div>';
             }
 
@@ -2163,7 +2259,9 @@
             if (hueSliderEl) {
                 hueSliderEl.addEventListener('input', function() {
                     const hue = parseInt(this.value);
-                    document.getElementById('hueValue').textContent = hue + '°';
+                    const valSpan = document.getElementById('hueValue');
+                    valSpan.textContent = hue + '°';
+                    valSpan.classList.remove('inactive');
                     pendingThemeId = 'custom';
                     pendingHue = hue;
                     renderPresetGrid();
@@ -2564,7 +2662,7 @@ ${themeCSS}
         .header-title-group{display:flex;flex-direction:column;align-items:center;position:absolute;left:50%;transform:translateX(-50%)}
         .header-title{font-size:18px;font-weight:400;color:var(--text-primary)}.header-id{font-size:12px;color:var(--text-secondary)}
         .menu-icon{display:flex;flex-direction:column;justify-content:center;align-items:flex-end;cursor:pointer;width:36px;height:36px}
-        .bar{display:block;width:24px;height:0;border-top:1px solid var(--bar-color);margin:4px 0}
+        .bar{display:block;width:24px;height:0;border-top:1px solid var(--text-secondary);margin:4px 0}
         .post-title{font-size:16.5px;color:var(--post-title-color);padding:14px 16px 2px;font-weight:500}
         .post-list{padding:0}.post-item{padding:16px;border-bottom:1px solid var(--post-separator);position:relative}
         .post-item:last-child{border-bottom:none}.post-header{display:flex;align-items:flex-start;margin-bottom:8px}
@@ -2610,7 +2708,12 @@ ${themeCSS}
                 if (v && v.startsWith('#')) return v.replace('#','%23');
                 return '#fededf'.replace('#','%23');
             })();
-            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='"+bg+"'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23ffffff'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23ffffff'/%3E%3C/svg%3E";
+            var fg = (function(){
+                var v = getComputedStyle(document.documentElement).getPropertyValue('--avatar-fg').trim();
+                if (v && v.startsWith('#')) return v.replace('#','%23');
+                return 'ffffff';
+            })();
+            return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='"+bg+"'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23"+fg+"'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23"+fg+"'/%3E%3C/svg%3E";
         }
         function renderPage(p){
             var total = Math.ceil(POSTS.length / PER_PAGE) || 1;
