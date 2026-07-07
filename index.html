@@ -69,7 +69,7 @@
         <div class="modal" id="modalConfig" role="dialog" aria-modal="true" aria-labelledby="modalConfigTitle">
             <h3 id="modalConfigTitle">⚙ 编辑板块配置</h3>
             <div class="form-group"><label>板块名称</label><input type="text" id="cfgBoardName"></div>
-            <div class="form-group"><label>板块ID</label><div style="display:flex;align-items:center;"><span style="padding:0 4px;font-weight:500;">ID:</span><input type="text" id="cfgBoardId" inputmode="numeric" pattern="[0-9]*" style="flex:1;"></div></div>
+            <div class="form-group"><label>板块ID</label><input type="text" id="cfgBoardId" inputmode="numeric"></div>
             <div class="form-group"><label>帖子标题</label><input type="text" id="cfgThreadTitle"></div>
             <!-- 主题选择器 -->
             <div class="theme-section">
@@ -1112,7 +1112,7 @@
                     const favBtn = ch.favorite ? '⭐收藏' : '☆收藏';
                     return `<div class="char-list-item">
                         <span data-avatar-char="${idx}" style="cursor:pointer;flex-shrink:0;">${avatarHtml}</span>
-                        <span style="flex:1;"><b data-char-name="${idx}" style="font-size:14px;">${escapeHtml(ch.name)}</b><br><small style="font-size:12px;">ID：${escapeHtml(ch.id)}</small><br><small style="color:#aaa;font-size:12px;">别名: <span data-char-alias="${idx}">${(ch.aliases||[]).join(', ')}</span></small></span>
+                        <span style="flex:1;font-size:13px;"><span data-char-name="${idx}" style="font-size:14px;">${escapeHtml(ch.name)}</span><br><span style="font-size:12px;">ID：${escapeHtml(ch.id)}</span><br><span style="color:#aaa;font-size:12px;">别名: <span data-char-alias="${idx}">${(ch.aliases||[]).join(', ')}</span></span></span>
                         <span class="char-actions">
                             <button class="char-btn" data-edit-char="${idx}">✎ 改名</button>
                             <button class="char-btn" data-fav-char="${idx}">${favBtn}</button>
@@ -1137,21 +1137,27 @@
                     const nameEl=document.querySelector('[data-char-name="'+idx+'"]');
                     if(!nameEl) return;
                     const wrap=document.createElement('span');
-                    wrap.style.cssText='display:inline-flex;align-items:center;max-width:130px;';
+                    wrap.style.cssText='display:inline-flex;align-items:center;max-width:160px;';
                     const input=document.createElement('input');
                     input.type='text'; input.value=ch.name; input.maxLength=20;
-                    input.style.cssText='font-size:inherit;font-weight:bold;width:100%;min-width:60px;height:24px;padding:0 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;line-height:24px;';
+                    input.style.cssText='font-size:14px;width:100%;min-width:50px;height:22px;padding:0 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;line-height:22px;';
                     const btn=document.createElement('button');
-                    btn.textContent='✓'; btn.style.cssText='font-size:inherit;height:24px;padding:0 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;line-height:24px;flex-shrink:0;';
-                    wrap.appendChild(input); wrap.appendChild(btn);
+                    const cancelBtn=document.createElement('button');
+                    cancelBtn.textContent='✕'; cancelBtn.style.cssText='font-size:12px;height:22px;padding:0 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0;background:var(--btn-bg);color:var(--btn-text);cursor:pointer;line-height:22px;flex-shrink:0;';
+                    btn.textContent='✓'; btn.style.cssText='font-size:12px;height:22px;padding:0 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;line-height:22px;flex-shrink:0;';
+                    wrap.appendChild(input); wrap.appendChild(cancelBtn); wrap.appendChild(btn);
                     nameEl.replaceWith(wrap); input.focus(); input.select();
                     const save=()=>{
                         const nn=input.value.trim(); if(!nn){ wrap.replaceWith(nameEl); return; }
+                        const oldName=ch.name;
                         ch.name=nn;
-                        saveToStorage(); renderAll(); updateCharListInModal(); showToast('已更新','success');
+                        const updated=POSTS.filter(p=>p.userId===ch.id&&p.username===oldName).length;
+                        POSTS.forEach(p=>{ if(p.userId===ch.id&&p.username===oldName) p.username=nn; });
+                        saveToStorage(); renderAll(); updateCharListInModal(); showToast(updated?'已更新，同步'+updated+'个帖子':'已更新','success');
                     };
                     const cancel=()=>{ wrap.replaceWith(nameEl); };
                     btn.addEventListener('click',save);
+                    cancelBtn.addEventListener('click',cancel);
                     input.addEventListener('keydown',ev=>{ if(ev.key==='Enter') save(); if(ev.key==='Escape') cancel(); });
                 }
                 if(aliasBtn){
@@ -1204,7 +1210,7 @@
             // 配置编辑
             document.getElementById('btnSaveConfig').addEventListener('click',()=>{
                 CONFIG.boardName=document.getElementById('cfgBoardName').value.trim()||CONFIG.boardName;
-                CONFIG.boardId=document.getElementById('cfgBoardId').value.replace(/\D/g,'')||CONFIG.boardId;
+                CONFIG.boardId=document.getElementById('cfgBoardId').value.trim()||CONFIG.boardId;
                 CONFIG.threadTitle=document.getElementById('cfgThreadTitle').value.trim()||CONFIG.threadTitle;
                 setTheme(pendingThemeId, pendingHue);
                 saveToStorage(); closeModal('modalConfigOverlay');
@@ -1212,7 +1218,7 @@
             });
             function populateConfigModal() {
                 document.getElementById('cfgBoardName').value=CONFIG.boardName;
-                document.getElementById('cfgBoardId').value=CONFIG.boardId.replace(/^ID:/,'');
+                document.getElementById('cfgBoardId').value=CONFIG.boardId;
                 document.getElementById('cfgThreadTitle').value=CONFIG.threadTitle;
                 pendingThemeId = currentThemeId;
                 pendingHue = currentHue;
@@ -1314,7 +1320,7 @@
             }
 
             // 角色搜索框交互
-            document.getElementById('charSearchInput').addEventListener('focus',function(){ document.getElementById('charSearchList').classList.add('open'); updateCharSearchList(this.value); });
+            document.getElementById('charSearchInput').addEventListener('focus',function(){ if(selectedCharIndex>=0){ this.value=''; selectedCharIndex=-1; selectedAlias=''; document.getElementById('aliasSearchInput').value=''; } document.getElementById('charSearchList').classList.add('open'); updateCharSearchList(this.value); });
             document.getElementById('charSearchInput').addEventListener('blur',function(){ setTimeout(()=>document.getElementById('charSearchList').classList.remove('open'),150); });
             document.getElementById('charSearchInput').addEventListener('input',function(){
                 updateCharSearchList(this.value);
@@ -1779,11 +1785,12 @@ ${themeCSS}
                     (function collect(no){ POSTS.forEach((p,i)=>{ if(p.quote&&p.quote.refNo===no&&!toDelete.has(i)){ toDelete.add(i); collect(p.no); } }); })(delNo);
                     const count=toDelete.size;
                     if(!confirm(count>1?`删除 Nº${delNo} 及其 ${count-1} 条回复？`:`删除 Nº${delNo}？`)) return;
-                    // 按索引降序删除
+                    // 记录被删帖子的 no 值，然后按索引降序删除
+                    const deletedNos=[...toDelete].map(i=>POSTS[i].no).sort((a,b)=>a-b);
                     [...toDelete].sort((a,b)=>b-a).forEach(i=>POSTS.splice(i,1));
-                    // 重排编号
+                    // 平移式重排编号：保留跳楼层缺口
                     POSTS.sort((a,b)=>a.no-b.no);
-                    const oldToNew={}; POSTS.forEach((p,i)=>{ oldToNew[p.no]=i; p.no=i; });
+                    const oldToNew={}; POSTS.forEach(p=>{ const shift=deletedNos.filter(dn=>dn<p.no).length; const nn=p.no-shift; oldToNew[p.no]=nn; p.no=nn; });
                     // 更新 refNo
                     POSTS.forEach(p=>{ if(p.quote&&p.quote.refNo>=0&&oldToNew[p.quote.refNo]!==undefined) p.quote.refNo=oldToNew[p.quote.refNo]; });
                     saveToStorage(); adjustPageAfterChange(); showToast(`已删除 ${count} 条`,'warning');
