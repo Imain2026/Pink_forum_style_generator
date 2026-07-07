@@ -820,7 +820,7 @@
 
             function saveToStorage() { try{localStorage.setItem(STORAGE_KEY,JSON.stringify({config:CONFIG,characters:CHARACTERS,posts:POSTS}));}catch(e){} }
             function loadFromStorage() { try{const r=localStorage.getItem(STORAGE_KEY); if(r){const d=JSON.parse(r); if(d.config)CONFIG=d.config; if(d.characters)CHARACTERS=d.characters; if(d.posts)POSTS=d.posts; return true;}}catch(e){} return false; }
-            function resetToDefault() { CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); saveToStorage(); setTheme('classic', -2); renderAll(); showToast('已重置','warning'); }
+            function resetToDefault() { localStorage.removeItem('forum_data_v8'); localStorage.removeItem('forum_theme_v8'); CONFIG=JSON.parse(JSON.stringify(DEFAULT_CONFIG)); CHARACTERS=JSON.parse(JSON.stringify(DEFAULT_CHARACTERS)); POSTS=JSON.parse(JSON.stringify(DEFAULT_POSTS)); setTheme('classic', -2); renderAll(); showToast('已重置','warning'); }
 
             function autoFixPosts() {
                 let changed=false;
