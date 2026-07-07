@@ -254,11 +254,10 @@
 
         .post-actions {
             display: flex;
-            position: absolute;
-            bottom: 10px;
-            right: 10px;
+            justify-content: flex-end;
             gap: 6px;
-            z-index: 2;
+            padding: 8px 0 0 0;
+            margin-top: 8px;
         }
         .post-action-btn {
             font-size: 11px;
@@ -1037,10 +1036,6 @@
 
         /* ===== 移动端触摸目标增大 ===== */
         @media (pointer: coarse) {
-            .post-action-btn {
-                font-size: 13px;
-                padding: 6px 14px;
-            }
             .char-btn {
                 font-size: 13px;
                 padding: 6px 14px;
