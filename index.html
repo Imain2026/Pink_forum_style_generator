@@ -967,8 +967,6 @@
                 const closeBtn = e.target.closest('[data-close]');
                 if (closeBtn) { const targetId = closeBtn.getAttribute('data-close'); if(targetId) closeModal(targetId); }
             });
-            document.addEventListener('keydown', e => { if(e.key==='Escape') closeAllModals(); });
-
             document.getElementById('btnPrevPage').addEventListener('click', ()=>{ if(currentPage>0) renderPostsPage(currentPage-1); });
             document.getElementById('btnNextPage').addEventListener('click', ()=>{ const total=Math.ceil(POSTS.length/POSTS_PER_PAGE)||1; if(currentPage<total-1) renderPostsPage(currentPage+1); });
 
@@ -1819,8 +1817,6 @@ ${themeCSS}
                     saveToStorage(); adjustPageAfterChange(); showToast(`已删除 ${count} 条`,'warning');
                 }
             });
-
-            document.addEventListener('keydown',e=>{ if(e.ctrlKey&&e.key==='n'){ e.preventDefault(); populatePostForm(-1); openModal('modalPostOverlay'); } if(e.ctrlKey&&e.key==='s'){ e.preventDefault(); saveToStorage(); showToast('已保存'); } });
 
             function init(){
                 loadThemePreference();
