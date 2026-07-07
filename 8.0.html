@@ -2124,12 +2124,12 @@
                     const favBtn = ch.favorite ? '⭐收藏' : '☆收藏';
                     return `<div class="char-list-item">
                         <span data-avatar-char="${idx}" style="cursor:pointer;flex-shrink:0;">${avatarHtml}</span>
-                        <span style="flex:1;"><b>${escapeHtml(ch.name)}</b> <small>${escapeHtml(ch.id)}</small><br><small style="color:#aaa;">别名: ${(ch.aliases||[]).join(', ')||'无'}</small></span>
+                        <span style="flex:1;"><b data-char-name="${idx}">${escapeHtml(ch.name)}</b> <small>${escapeHtml(ch.id)}</small><br><small style="color:#aaa;">别名: <span data-char-alias="${idx}">${(ch.aliases||[]).join(', ')||'无'}</span></small></span>
                         <span class="char-actions">
                             <button class="char-btn" data-edit-char="${idx}">✎ 改名</button>
                             <button class="char-btn" data-fav-char="${idx}">${favBtn}</button>
                             <button class="char-btn" data-alias-char="${idx}">🏷️ 别名</button>
-                            <button class="char-btn danger-char" data-delete-char="${idx}">✕ 删除</button>
+                            <button class="char-btn danger-char" data-delete-char="${idx}" data-del-state="0">✕ 删除</button>
                         </span>
                     </div>`;
                 }).join('');
@@ -2145,26 +2145,69 @@
                 const delBtn=e.target.closest('[data-delete-char]');
                 if(editBtn){
                     const idx=parseInt(editBtn.getAttribute('data-edit-char')); if(isNaN(idx)) return;
-                    const ch=CHARACTERS[idx]; const nn=prompt(`修改"${ch.name}"的昵称：`,ch.name);
-                    if(!nn||!nn.trim()) return; const update=confirm('同时更新所有楼层？(默认否)');
-                    if(update) POSTS.forEach(p=>{if(p.userId===ch.id) p.username=nn.trim();});
-                    if(!ch.aliases.includes(nn.trim())) ch.aliases.push(nn.trim());
-                    ch.name=nn.trim(); saveToStorage(); renderAll(); updateCharListInModal();
-                    showToast('已更新','success');
+                    const ch=CHARACTERS[idx];
+                    const nameEl=document.querySelector('[data-char-name="'+idx+'"]');
+                    if(!nameEl) return;
+                    const wrap=document.createElement('span');
+                    wrap.style.cssText='display:inline-flex;align-items:center;max-width:130px;';
+                    const input=document.createElement('input');
+                    input.type='text'; input.value=ch.name;
+                    input.style.cssText='font-size:inherit;font-weight:bold;width:100%;min-width:60px;height:24px;padding:0 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;line-height:24px;';
+                    const btn=document.createElement('button');
+                    btn.textContent='✓'; btn.style.cssText='font-size:inherit;height:24px;padding:0 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;line-height:24px;flex-shrink:0;';
+                    wrap.appendChild(input); wrap.appendChild(btn);
+                    nameEl.replaceWith(wrap); input.focus(); input.select();
+                    const save=()=>{
+                        const nn=input.value.trim(); if(!nn){ wrap.replaceWith(nameEl); return; }
+                        ch.name=nn; if(!ch.aliases.includes(nn)) ch.aliases.push(nn);
+                        saveToStorage(); renderAll(); updateCharListInModal(); showToast('已更新','success');
+                    };
+                    const cancel=()=>{ wrap.replaceWith(nameEl); };
+                    btn.addEventListener('click',save);
+                    input.addEventListener('keydown',ev=>{ if(ev.key==='Enter') save(); if(ev.key==='Escape') cancel(); });
                 }
                 if(aliasBtn){
                     const idx=parseInt(aliasBtn.getAttribute('data-alias-char')); if(isNaN(idx)) return;
-                    const ch=CHARACTERS[idx]; const aliases=ch.aliases||[];
-                    const act=prompt(`别名: ${aliases.join(', ')}\n输入新别名，或"删除:别名"`, '');
-                    if(!act) return;
-                    if(act.startsWith('删除:')){ const t=act.replace('删除:','').trim(); if(aliases.includes(t)&&aliases.length>1){ ch.aliases=aliases.filter(a=>a!==t); saveToStorage(); renderAll(); updateCharListInModal(); showToast(`别名"${t}"已删除`); } else showToast('无法删除','warning'); }
-                    else { if(!aliases.includes(act.trim())){ ch.aliases.push(act.trim()); saveToStorage(); renderAll(); updateCharListInModal(); showToast(`别名"${act.trim()}"已添加`); } else showToast('已存在','warning'); }
+                    const ch=CHARACTERS[idx];
+                    const aliasEl=document.querySelector('[data-char-alias="'+idx+'"]');
+                    if(!aliasEl) return;
+                    const aliases=ch.aliases||[];
+                    const wrapper=document.createElement('span');
+                    const buildAliasHTML=()=>aliases.map(a=>`<span style="display:inline-block;background:var(--btn-bg);border-radius:8px;padding:1px 6px;margin:1px 2px;font-size:11px;">${escapeHtml(a)}<span data-alias-del="${idx}" data-alias-val="${escapeHtml(a)}" style="cursor:pointer;margin-left:3px;color:var(--text-secondary);">&times;</span></span>`).join('')+' ';
+                    wrapper.innerHTML=buildAliasHTML();
+                    const inp=document.createElement('input');
+                    inp.type='text'; inp.placeholder='新别名…'; inp.style.cssText='font-size:11px;width:80px;padding:1px 4px;border:1px solid var(--input-focus);border-radius:4px 0 0 4px;outline:none;';
+                    const addBtn=document.createElement('button');
+                    addBtn.textContent='✓'; addBtn.style.cssText='font-size:11px;padding:1px 5px;border:1px solid var(--input-focus);border-left:none;border-radius:0 4px 4px 0;background:var(--btn-primary-bg);color:var(--btn-primary-text);cursor:pointer;';
+                    wrapper.appendChild(inp); wrapper.appendChild(addBtn);
+                    aliasEl.replaceWith(wrapper); inp.focus();
+                    const saveAliases=()=>{ ch.aliases=aliases.slice(); saveToStorage(); renderAll(); updateCharListInModal(); };
+                    const addAlias=(a)=>{ a=a.trim(); if(a&&!aliases.includes(a)){ aliases.push(a); saveAliases(); showToast('别名已添加'); } else if(!a.trim()){ saveAliases(); } };
+                    const doAdd=()=>{ addAlias(inp.value); inp.value=''; inp.focus(); };
+                    addBtn.addEventListener('click',doAdd);
+                    inp.addEventListener('keydown',ev=>{ if(ev.key==='Enter') doAdd(); if(ev.key==='Escape'){ saveAliases(); } });
+                    wrapper.addEventListener('click',ev=>{
+                        const delSpan=ev.target.closest('[data-alias-del]');
+                        if(delSpan){
+                            const val=delSpan.getAttribute('data-alias-val');
+                            const i=aliases.indexOf(val);
+                            if(i>=0){ aliases.splice(i,1); saveAliases(); showToast('别名已删除'); }
+                        }
+                    });
                 }
                 if(delBtn){
-                    const idx=parseInt(delBtn.getAttribute('data-delete-char')); if(isNaN(idx)) return;
-                    if(!confirm(`删除角色"${CHARACTERS[idx].name}"？`)) return;
-                    CHARACTERS.splice(idx,1); saveToStorage(); renderAll(); updateCharListInModal();
-                    showToast('已删除','warning');
+                    const state=parseInt(delBtn.getAttribute('data-del-state'))||0;
+                    if(state===0){
+                        delBtn.setAttribute('data-del-state','1');
+                        delBtn.textContent='确认删除？';
+                        delBtn.style.background='var(--btn-primary-bg)';
+                        delBtn.style.color='var(--btn-primary-text)';
+                        clearTimeout(delBtn._timeout);
+                        delBtn._timeout=setTimeout(()=>{ delBtn.setAttribute('data-del-state','0'); delBtn.textContent='✕ 删除'; delBtn.style.background=''; delBtn.style.color=''; },3000);
+                    } else {
+                        const idx=parseInt(delBtn.getAttribute('data-delete-char')); if(isNaN(idx)) return;
+                        CHARACTERS.splice(idx,1); saveToStorage(); renderAll(); updateCharListInModal(); showToast('已删除','warning');
+                    }
                 }
             });
             document.getElementById('btnAddChar').addEventListener('click',()=>{
@@ -2696,6 +2739,8 @@ ${themeCSS}
         var POSTS = ${postsJson};
         var CHARS = ${charsJson};
         var CONFIG = ${cfgJson};
+        var THEME_ID = '${currentThemeId}';
+        var THEME_HUE = ${currentHue};
         var PER_PAGE = 20;
         var curPage = 0;
         function escapeHtml(s){ return String(s).replace(/[&<>"']/g, m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'})[m]); }
@@ -2710,7 +2755,7 @@ ${themeCSS}
             })();
             var fg = (function(){
                 var v = getComputedStyle(document.documentElement).getPropertyValue('--avatar-fg').trim();
-                if (v && v.startsWith('#')) return v.replace('#','%23');
+                if (v && v.startsWith('#')) return v.replace('#','');
                 return 'ffffff';
             })();
             return "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='"+bg+"'/%3E%3Ccircle cx='50' cy='40' r='20' fill='%23"+fg+"'/%3E%3Ccircle cx='50' cy='75' r='30' fill='%23"+fg+"'/%3E%3C/svg%3E";
@@ -2769,7 +2814,7 @@ ${themeCSS}
             document.getElementById('btnImportExport').addEventListener('click', ()=>{ openModal('modalImportExportOverlay'); });
             document.getElementById('btnExportFile').addEventListener('click', ()=>{
                 const exportObj = {};
-                if (document.getElementById('exportConfig').checked) exportObj.config = CONFIG;
+                if (document.getElementById('exportConfig').checked) { exportObj.config = CONFIG; exportObj.theme = { themeId: currentThemeId, hue: currentHue }; }
                 if (document.getElementById('exportData').checked) { exportObj.characters = CHARACTERS; exportObj.posts = POSTS; }
                 if (Object.keys(exportObj).length === 0) { showToast('至少选择一项导出内容','warning'); return; }
                 const blob = new Blob([JSON.stringify(exportObj, null, 2)], {type:'application/json'});
@@ -2798,6 +2843,7 @@ ${themeCSS}
                 if (!pendingImportData) { showToast('请先选择JSON文件','warning'); return; }
                 let changes = false;
                 if (pendingImportData.config) { CONFIG = pendingImportData.config; changes = true; }
+                if (pendingImportData.theme && pendingImportData.theme.themeId) { setTheme(pendingImportData.theme.themeId, pendingImportData.theme.hue != null ? pendingImportData.theme.hue : 340); changes = true; }
                 if (pendingImportData.characters) { CHARACTERS = pendingImportData.characters; changes = true; }
                 if (pendingImportData.posts) { POSTS = pendingImportData.posts; changes = true; }
                 if (changes) { saveToStorage(); renderAll(); showToast('导入成功','success'); }
