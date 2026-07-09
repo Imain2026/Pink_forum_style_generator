@@ -52,12 +52,12 @@
             <h3 id="modalCharsTitle">👤 角色库管理</h3>
             <div id="charListContainer"></div>
             <div class="form-group" style="margin-top:10px;">
-                <input type="text" id="charSearch" placeholder="搜索角色或ID">
+                <input type="text" id="charSearch" placeholder="搜索角色或fjf码">
             </div>
             <div style="border-top:1px solid #eee; margin-top:10px; padding-top:10px;">
                 <div class="form-row">
                     <div class="form-group form-half"><label>新角色</label><input type="text" id="newCharName" placeholder='留空默认"=="' maxlength="20"></div>
-                    <div class="form-group form-half"><label>ID</label><input type="text" id="newCharId" placeholder="自动生成"></div>
+                    <div class="form-group form-half"><label>fjf码</label><input type="text" id="newCharId" placeholder="自动生成"></div>
                 </div>
                 <div class="form-actions" style="margin-top:12px;"><button class="btn-primary" id="btnAddChar">添加角色</button><button class="btn-secondary" data-close="modalCharsOverlay">关闭</button></div>
             </div>
@@ -102,15 +102,15 @@
             <div class="form-group" id="groupPresetChar">
                 <label>选择 / 新建角色</label>
                 <div class="search-select-wrap">
-                    <input type="text" class="search-select-input" id="charSearchInput" placeholder="输入或搜索角色名（或ID）" autocomplete="off" maxlength="20">
+                    <input type="text" class="search-select-input" id="charSearchInput" placeholder="输入或搜索角色名（或fjf码）" autocomplete="off" maxlength="20">
                     <div class="search-select-list" id="charSearchList"></div>
                 </div>
             </div>
 
             <!-- 指定/随机ID -->
             <div class="form-group" id="groupCustomId">
-                <label>指定 / 随机ID</label>
-                <input type="text" id="postCustomId" placeholder="留空自动生成8位hex">
+                <label>指定 / 随机fjf码</label>
+                <input type="text" id="postCustomId" placeholder="留空自动生成8位fjf码">
             </div>
 
             <!-- 别名区，始终显示 -->
@@ -1114,7 +1114,7 @@
                     const favBtn = ch.favorite ? '⭐收藏' : '☆收藏';
                     return `<div class="char-list-item">
                         <span data-avatar-char="${idx}" style="cursor:pointer;flex-shrink:0;">${avatarHtml}</span>
-                        <span style="flex:1;font-size:13px;"><span data-char-name="${idx}" style="font-size:14px;">${escapeHtml(ch.name)}</span><br><span style="font-size:12px;">ID：${escapeHtml(ch.id)}</span><br><span style="color:#aaa;font-size:12px;">别名: <span data-char-alias="${idx}">${(ch.aliases||[]).join(', ')}</span></span></span>
+                        <span style="flex:1;font-size:13px;"><span data-char-name="${idx}" style="font-size:14px;">${escapeHtml(ch.name)}</span><br><span style="font-size:12px;">fjf码：${escapeHtml(ch.id)}</span><br><span style="color:#aaa;font-size:12px;">别名: <span data-char-alias="${idx}">${(ch.aliases||[]).join(', ')}</span></span></span>
                         <span class="char-actions">
                             <button class="char-btn" data-edit-char="${idx}">✎ 改名</button>
                             <button class="char-btn" data-fav-char="${idx}">${favBtn}</button>
@@ -1203,7 +1203,7 @@
             document.getElementById('btnAddChar').addEventListener('click',()=>{
                 const nm = document.getElementById('newCharName').value.trim() || '==';
                 const id = document.getElementById('newCharId').value.trim() || generateRandomId();
-                if(CHARACTERS.some(c=>c.id===id)){ showToast('ID重复','warning'); return; }
+                if(CHARACTERS.some(c=>c.id===id)){ showToast('fjf码重复','warning'); return; }
                 CHARACTERS.push({id, name:nm, aliases:[], avatar:'', favorite:false});
                 document.getElementById('newCharName').value=''; document.getElementById('newCharId').value='';
                 saveToStorage(); renderAll(); updateCharListInModal(); showToast(`已添加"${nm}"`);
@@ -1577,7 +1577,7 @@
                     const customId = document.getElementById('postCustomId').value.trim();
                     userId = customId || generateRandomId();
                     if (CHARACTERS.some(c => c.id === userId)) {
-                        showToast('ID重复，请重新输入', 'warning');
+                        showToast('fjf码重复，请重新输入', 'warning');
                         return;
                     }
                     const newChar = { id: userId, name: nameInput || '==', aliases: [], avatar: '', favorite: false };
