@@ -71,6 +71,7 @@
             <div class="form-group"><label>板块名称</label><input type="text" id="cfgBoardName"></div>
             <div class="form-group"><label>板块ID</label><input type="text" id="cfgBoardId" inputmode="numeric"></div>
             <div class="form-group"><label>帖子标题</label><input type="text" id="cfgThreadTitle"></div>
+            <div class="form-group"><label class="checkbox-item"><input type="checkbox" id="cfgShowFjfCode"> 显示用户fjf码</label></div>
             <!-- 主题选择器 -->
             <div class="theme-section">
                 <div class="theme-section-label">🎨 颜色主题</div>
@@ -185,6 +186,7 @@
             const DEFAULT_CONFIG = {
                 boardName: '示例板块', boardId: '19970811',
                 threadTitle: '【示例】一个示例帖子',
+                showFjfCode: true,
             };
             const DEFAULT_CHARACTERS = [
                 { id: '7410ea09', name: '==', aliases: [], avatar: '', favorite: false },
@@ -858,7 +860,8 @@
 
             function buildQuoteBlock(quote,refPost,refNo) {
                 const c=document.createElement('div'); c.className='quote-container';
-                c.innerHTML=`<div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refNo} ☆☆☆ ${escapeHtml(refPost.username||'==')}|${escapeHtml(refPost.userId||'????')} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
+                const qFjf = CONFIG.showFjfCode!==false ? '|'+escapeHtml(refPost.userId||'????') : '';
+                c.innerHTML=`<div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">${quote.refContent}<div class="inner-post-footer">Nº${refNo} ☆☆☆ ${escapeHtml(refPost.username||'==')}${qFjf} 于${escapeHtml(refPost.time)} 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div>`;
                 return c;
             }
 
@@ -901,7 +904,8 @@
                     const d=document.createElement('div'); d.className='post-item';
                     const char = findCharById(p.userId);
                     const avatarSrc = getAvatarSrc(char);
-                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span><span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span></div><div class="time-row">Nº${p.no} ${escapeHtml(p.time)}</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${arrIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${arrIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${arrIdx}">✕ 删除</button></div>`;
+                    const fjfHtml = CONFIG.showFjfCode!==false ? `<span class="user-id-separator">|</span><span class="user-id">${escapeHtml(p.userId||'????????')}</span>` : '';
+                    d.innerHTML=`<div class="post-header"><img class="avatar" src="${avatarSrc}" alt="头像"><div class="user-info"><div class="username-row"><span class="username">${escapeHtml(p.username||'==')}</span>${fjfHtml}</div><div class="time-row">Nº${p.no} ${escapeHtml(p.time)}</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content"></div><div class="post-actions"><button class="post-action-btn btn-edit" data-action="edit" data-index="${arrIdx}">✎ 编辑</button><button class="post-action-btn btn-reply" data-action="reply" data-index="${arrIdx}">↩ 回复</button><button class="post-action-btn btn-delete" data-action="delete" data-index="${arrIdx}">✕ 删除</button></div>`;
                     const contentDiv=d.querySelector('.post-content');
                     if(p.quote && p.quote.refNo>=0){
                         const refPost = findPostByNo(p.quote.refNo);
@@ -1214,6 +1218,7 @@
                 CONFIG.boardName=document.getElementById('cfgBoardName').value.trim()||CONFIG.boardName;
                 CONFIG.boardId=document.getElementById('cfgBoardId').value.trim()||CONFIG.boardId;
                 CONFIG.threadTitle=document.getElementById('cfgThreadTitle').value.trim()||CONFIG.threadTitle;
+                CONFIG.showFjfCode=document.getElementById('cfgShowFjfCode').checked;
                 setTheme(pendingThemeId, pendingHue);
                 saveToStorage(); closeModal('modalConfigOverlay');
                 showToast('配置已保存','success');
@@ -1222,6 +1227,7 @@
                 document.getElementById('cfgBoardName').value=CONFIG.boardName;
                 document.getElementById('cfgBoardId').value=CONFIG.boardId;
                 document.getElementById('cfgThreadTitle').value=CONFIG.threadTitle;
+                document.getElementById('cfgShowFjfCode').checked=CONFIG.showFjfCode!==false;
                 pendingThemeId = currentThemeId;
                 pendingHue = currentHue;
                 renderPresetGrid();
@@ -1715,10 +1721,11 @@ ${themeCSS}
                 }
                 prevNo=post.no;
 
-                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span><span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span></div><div class="time-row">Nº'+String(post.no)+' '+escapeHtml(post.time)+'</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content">';
+                var fjfHtml = CONFIG.showFjfCode!==false ? '<span class="user-id-separator">|</span><span class="user-id">'+escapeHtml(post.userId||'?')+'</span>' : '';
+                var html='<div class="post-item"><div class="post-header"><img class="avatar" src="'+av+'" alt="头像"><div class="user-info"><div class="username-row"><span class="username">'+escapeHtml(post.username||'==')+'</span>'+fjfHtml+'</div><div class="time-row">Nº'+String(post.no)+' '+escapeHtml(post.time)+'</div></div><span class="more-btn" aria-label="更多操作">...</span></div><div class="post-content">';
                 if(post.quote&&post.quote.refNo>=0){
                     var r=findPostByNo(post.quote.refNo);
-                    if(r) html+='<div class="quote-container"><div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">Nº'+String(post.quote.refNo)+' ☆☆☆ '+escapeHtml(r.username||'==')+'|'+escapeHtml(r.userId||'?')+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>';
+                    if(r){ var qFjfStatic = CONFIG.showFjfCode!==false ? '|'+escapeHtml(r.userId||'?') : ''; html+='<div class="quote-container"><div class="quote-header" aria-expanded="false"><span class="history-label">...历史引用</span><span class="toggle-text">展开全部 ▼</span></div><div class="quote-content is-hidden">'+post.quote.refContent+'<div class="inner-post-footer">Nº'+String(post.quote.refNo)+' ☆☆☆ '+escapeHtml(r.username||'==')+qFjfStatic+' 于'+escapeHtml(r.time)+' 留言 ☆☆☆</div><div class="collapse-btn" aria-expanded="true">...隐藏 ▲</div></div><div class="quote-bottom-msg">留言 ☆☆☆</div></div>'; }
                 }
                 html+='<div>'+post.content+'</div></div></div>';
                 list.innerHTML+=html;
